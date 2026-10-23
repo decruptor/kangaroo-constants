@@ -1,0 +1,19 @@
+# build artifacts
+*.o
+*.out
+kangsim
+kangsim6
+eckang
+walktest
+hashtest
+rho_ref*
+rho1
+rho2
+
+# raw run outputs kept out of the paper repo until curated
+out/
+*.log
+
+# editor / OS noise
+.DS_Store
+*~

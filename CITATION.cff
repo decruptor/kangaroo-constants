@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this software or these measurements, please cite it as below."
+title: "An empirical analysis of Pollard-kangaroo walk constants for interval ECDLP on secp256k1, including the unpublished SOTA family"
+authors:
+  - alias: Decruptor
+    given-names: Decruptor
+    notes: "Pseudonymous author."
+version: 0.1.0
+date-released: "2026-10-23"
+license: GPL-3.0-or-later
+type: article
+abstract: >-
+  We report the first independent, large-sample validation of the walk constants
+  of the "SOTA" and "SOTA+" kangaroo methods for interval ECDLP on secp256k1 —
+  an unpublished family due to RetiredCoder that underlies the fastest publicly
+  known solvers for the Bitcoin-puzzle ranges. Using a hash-oracle model of the
+  group, we run ~5.1e5 full DLP solves across 70 configurations at interval
+  widths 2^31–2^47 and reproduce all published constants within ±0.02; we
+  validate and delimit RC's DP-overhead formula, analyze the walk-confinement
+  and selection-rule mechanisms behind the constants, and report negative
+  results on the mirror second sample and the sqrt(pi/2) "floor" for 1-D walks.
+keywords:
+  - elliptic curve discrete logarithm
+  - Pollard kangaroo
+  - interval DLP
+  - secp256k1
+  - distinguished points
+  - Bitcoin puzzle
+repository-code: "[repo-url]"
+related:
+  - type: isSupplementTo
+    note: "ePrint preprint [eprint-url]"
