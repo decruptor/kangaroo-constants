@@ -1,6 +1,7 @@
 # An empirical analysis of Pollard-kangaroo walk constants for interval ECDLP on secp256k1, including the unpublished SOTA family
 
-*One-page abstract — draft for review, not submitted.*
+*Full abstract — draft for review, not submitted. The ~250-word trim for the IACR ePrint
+submission form follows at the bottom of this file.*
 
 **Background.** For the elliptic-curve discrete logarithm problem in an interval of width W, the
 kangaroo method's cost is K·√W group operations, and the constant K is the entire practical
@@ -57,3 +58,27 @@ and negative results, and claims no priority on the method. The puzzles motivate
 same quantities size the cost of recovering low-entropy keys, which is the standard argument for
 rejecting weak nonces. Full data, simulator sources and the run matrix are reproducible from
 single-file C programs listed in the paper's appendix.
+
+---
+
+## ePrint submission trim (~250 words)
+
+To our knowledge, we report the first independent, large-sample validation of the walk constants of
+the "SOTA" and "SOTA+" kangaroo methods for interval ECDLP on secp256k1 — an unpublished family due
+to RetiredCoder that underlies the fastest publicly known solvers for the Bitcoin-puzzle ranges.
+Using a hash-oracle model of the group, we run ~5.1·10^5 full DLP solves across 70 configurations
+at interval widths 2^31–2^47, reproducing all published constants: SOTA K = 1.15 (measured
+1.1537 ± 0.0195), SOTA+ 1.02/1.05/0.99 (measured 1.0242, 1.0548, 1.0093), classic ≈ 2.1, 3-way
+≈ 1.6. RC's distinguished-point overhead formula is validated to ≤ 2.5% over DPK ∈ [0.025, 74] at
+the calibration herd and range, and its failure regimes are charted quantitatively. The SOTA walk
+is confined: displacement saturates at ≈ 350–800·√W within 10^3–10^4 steps, explaining tiny start
+ranges and why loop handling dominates at large ranges (naive restarts degrade 1.15 → 1.95 at
+2^47). For the SOTA+ rules we derive the per-step DP rate exactly (1/32, 1/21.33, 1/25.6, 1/18.29)
+and an empirical Herfindahl law reproducing every constant to ≤ 1%. Re-keying the branch tag to an
+independent hash decomposes the SOTA+ gain into a concentration component (10.0% of the 17.8%
+total gain at 2^31/dp5) and a DP-synergy component worth exactly the DP-overhead share. The 0.99
+"GPU" constant is a CPU number: the second point must cost < 0.14–0.22 op/step — true for
+unbatched CPU inversion (≈ 0.01–0.05 op), false on batched-inversion GPUs; RC's own GPU kernel
+ships plain SOTA. Negative results: the correlated mirror sample is unprofitable at any price;
+1-D endomorphism-accelerated walks are obstructed because GLV λ-orbits preserve no interval of
+width W ≪ n, falsifying the claimed √(π/2) ≈ 1.2533 floor as an unrestricted statement.

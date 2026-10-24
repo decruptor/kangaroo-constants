@@ -26,7 +26,7 @@ keywords:
   - secp256k1
   - distinguished points
   - Bitcoin puzzle
-repository-code: "[repo-url]"
+repository-code: "https://github.com/decruptor/kangaroo-constants"
 related:
   - type: isSupplementTo
-    note: "ePrint preprint [eprint-url]"
+    note: "ePrint preprint (number pending moderation)"

@@ -17,3 +17,7 @@ out/
 # editor / OS noise
 .DS_Store
 *~
+
+# compiled binaries
+kangsim_final
+walktest_x
