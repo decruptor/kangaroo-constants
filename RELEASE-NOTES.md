@@ -22,7 +22,7 @@ Contents:
 
 Known gaps at release time:
 
-- ePrint number: placeholder `[eprint-url]` in README.md and CITATION.cff —
+- ePrint number: **2026/112804** filled into README.md and CITATION.cff
   fill in after ePrint acceptance.
 - The raw per-configuration outputs of the Appendix A run matrix (`out/`
   batch files) are not yet in the repo; copy them from the analysis snapshot
@@ -32,4 +32,4 @@ Known gaps at release time:
   before or at submission: the real-curve SOTA+ 2.1σ discrepancy (§5.6) and a
   higher-trial replication of the independent-tag control (§3.4).
 
-Placeholders to replace before publishing: `[eprint-url]`, `[repo-url]`.
+Placeholders replaced 2026-10-24: repo URLs live, ePrint number 2026/112804 assigned.

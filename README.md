@@ -2,7 +2,7 @@
 
 **Author:** Decruptor (pseudonymous)
 **Status:** preprint draft, v0.1. Paper PDF/text: [`paper.md`](paper.md) (one-page version in [`abstract.md`](abstract.md)).
-**ePrint:** *(to be filled in on submission — this line gets the 2026/NNNN number)*
+**ePrint:** [2026/112804](https://eprint.iacr.org/2026/112804)
 
 ## What this is
 
