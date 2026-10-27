@@ -7,7 +7,7 @@
 of the revised PDF. An earlier copy of `paper.md` here (first-draft lineage, last edited
 2026-10-24) and the PDFs circulated before this revision had drifted apart; both are
 superseded by this file.
-**ePrint:** [2026/112804](https://eprint.iacr.org/2026/112804)
+**ePrint:** submission pending (an earlier submission was declined on a formality — no author line on the PDF title page — and is being resubmitted; the number will be added here).
 
 ## What this is
 
