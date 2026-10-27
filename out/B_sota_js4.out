@@ -1,0 +1,6 @@
+# method=SOTA n=32 (W=2^31) kang=512 DP=5 M=2^14 trials=12000 v=2 walt=0/1000 mirror=0 jm=2.00
+matches: tw=8037 ww=38482 tt=97638 other=0 restarts=27758 steps=786994820
+solved 12000/12000  K_main=1.4152 +/- 0.0118 (95%CI)  median=1.3446  sd=0.6596
+dp_rate=1/32.0  matches: tame-wild=8037 wild-wild=38482 tame-tame=97638 other=0  best |cand-k'|=197011  maxdisp=2.323e+09 (sqrtW=4.634e+04)
+ops_mean=65583 (2^16.00)  DPs_per_kang=4.00  restarts/kang=0.005
+RC formula: DPs_per_kang(ideal)=3.253 -> K=1.3987

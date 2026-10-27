@@ -1,0 +1,6 @@
+# bandm2: n=32 (W=2^31) M=2^9 walks=40 (alternating tame/wild)
+tail: mean=906 median=630 min=73 max=3618 steps  (tame 1021 / wild 792)
+period: mean=191 median=2 min=2 max=1988 steps  (tame 312 / wild 70)
+band/√W at cycle entry: mean=366.8 median=321.3 min=51.7 max=1155.8  (tame 387.9 / wild 345.6)
+band growth over one extra period: mean=0.000e+00 max=0.000e+00 (0 = confirmed periodic)
+band/√W at budget cutoffs 1e3/1e4/1e5/1e6: 305.6 / 366.8 / 366.8 / 366.8 (means)

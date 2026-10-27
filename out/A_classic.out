@@ -1,0 +1,5 @@
+# method=classic-herd n=41 (W=2^40) kang=512 DP=5 M=2^14 trials=4000 v=2 walt=0/1000 mirror=0 jm=2.00
+matches: tw=4024 ww=188563 tt=192670 other=0 restarts=0 steps=8855508585
+solved 4000/4000  K_main=2.1113 +/- 0.0348 (95%CI)  median=1.9731  sd=1.1237
+dp_rate=1/32.0  matches: tame-wild=4024 wild-wild=188563 tame-tame=192670 other=0  best |cand-k'|=2175326  maxdisp=1.310e+12 (sqrtW=1.049e+06)
+ops_mean=2213877 (2^21.08)  DPs_per_kang=135.14  restarts/kang=0.000

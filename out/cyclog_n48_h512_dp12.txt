@@ -1,0 +1,5 @@
+--- h=512 dp12 (paper: simple 1.4416, esc 1.4397)
+cyclog: kangaroos-cycling-at-solve = 0.0% (0/30720 over 60 trials)
+matches: tw=36 ww=6131 tt=5198 other=0 restarts=32497 steps=1098450274
+solved 60/60  K_main=1.5432 +/- 0.2272 (95%CI)  median=1.3944  sd=0.8979
+ops_mean=18307505 (2^24.13)  DPs_per_kang=8.73  restarts/kang=1.058

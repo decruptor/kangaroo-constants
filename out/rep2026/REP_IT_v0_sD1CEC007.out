@@ -1,0 +1,8 @@
+# method=SOTA+ n=32 (W=2^31) kang=512 DP=5 M=2^14 trials=4000 v=0 walt=0/1000 mirror=0 jm=2.00 it=1
+matches: tw=2707 ww=14685 tt=30780 other=0 restarts=12392 steps=238179652
+solved 4000/4000  K_main=1.2849 +/- 0.0182 (95%CI)  median=1.2240  sd=0.5877
+K_weighted(alt=0/1000)=1.2849
+dp_rate=1/32.0  matches: tame-wild=2707 wild-wild=14685 tame-tame=30780 other=0  best |cand-k'|=8644  maxdisp=2.301e+09 (sqrtW=4.634e+04)
+ops_mean=59545 (2^15.86)  DPs_per_kang=3.63  restarts/kang=0.006
+RC formula: DPs_per_kang(ideal)=3.253 -> K=1.3987
+# invocation (from out/rep2026/scan_manifest.txt): ./kangsim6 -m 4 -v 0 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEC007

@@ -1,0 +1,111 @@
+# MANIFEST — the exact command behind every output file in out/
+#
+# Commands run from simulators/ with: kangsim = kangsim_final.c, kangsim_diag = kangsim_diag.c,
+# bandm2 = bandm2.c, eckang = eckang.c (all built as in the README). Default seed
+# 0xABCDEF0123456789 throughout. Each file reproduces from its command; the run-matrix
+# files reproduce the values the paper's first draft printed (FIXLOG.md).
+#
+# --- Appendix A run matrix: <file>.out  <command> ---
+A_1v1_jm0.5.out	./kangsim -m 0 -jm 0.5 -n 41 -t 1500 -k 512 -d 5
+A_1v1_jm1.out	./kangsim -m 0 -jm 1 -n 41 -t 800 -k 512 -d 5
+A_1v1_jm3.out	./kangsim -m 0 -jm 3 -n 41 -t 1500 -k 512 -d 5
+A_3way.out	./kangsim -m 2 -n 41 -t 4000 -k 512 -d 5
+A_classic.out	./kangsim -m 1 -n 41 -t 4000 -k 512 -d 5
+A_mirror.out	./kangsim -m 6 -n 41 -t 3000 -k 512 -d 5
+A_sota.out	./kangsim -m 3 -n 41 -t 4000 -k 512 -d 5
+A_sota_mirror.out	./kangsim -m 3 -mirror -n 41 -t 4000 -k 512 -d 5
+A_sota_mirror_paid2.out	./kangsim -m 3 -mirror -w 300 -n 41 -t 4000 -k 512 -d 5
+A_sota_mirror_paid2_t3000.out	./kangsim -m 3 -mirror -w 300 -n 41 -t 3000 -k 512 -d 5
+A_sotap_mirror.out	./kangsim -m 4 -v 2 -mirror -n 41 -t 4000 -k 512 -d 5
+A_sotap_mirror_paid.out	./kangsim -m 4 -v 2 -mirror -w 150 -n 41 -t 4000 -k 512 -d 5
+A_sotap_v0.out	./kangsim -m 4 -v 0 -n 41 -t 4000 -k 512 -d 5
+A_sotap_v0_paid.out	./kangsim -m 4 -v 0 -w 1000 -n 41 -t 4000 -k 512 -d 5
+A_sotap_v1.out	./kangsim -m 4 -v 1 -n 41 -t 4000 -k 512 -d 5
+A_sotap_v2.out	./kangsim -m 4 -v 2 -n 41 -t 4000 -k 512 -d 5
+A_sotap_v2_paid.out	./kangsim -m 4 -v 2 -w 1000 -n 41 -t 4000 -k 512 -d 5
+B_1v1_jm0.5_clean.out	./kangsim -m 0 -jm 0.5 -n 32 -t 20000 -k 512 -d 5
+B_1v1_jm1_clean.out	./kangsim -m 0 -jm 1 -n 32 -t 20000 -k 512 -d 5
+B_1v1_jm2_clean.out	./kangsim -m 0 -jm 2 -n 32 -t 20000 -k 512 -d 5
+B_1v1_jm3_clean.out	./kangsim -m 0 -jm 3 -n 32 -t 20000 -k 512 -d 5
+B_1v1_jm4_clean.out	./kangsim -m 0 -jm 4 -n 32 -t 20000 -k 512 -d 5
+B_3way.out	./kangsim -m 2 -n 32 -t 20000 -k 512 -d 5
+B_classic.out	./kangsim -m 1 -n 32 -t 20000 -k 512 -d 5
+B_mirror.out	./kangsim -m 6 -n 32 -t 20000 -k 512 -d 5
+B_sota.out	./kangsim -m 3 -n 32 -t 20000 -k 512 -d 5
+B_sota_M11.out	./kangsim -m 3 -M 11 -n 32 -t 12000 -k 512 -d 5
+B_sota_M9.out	./kangsim -m 3 -M 9 -n 32 -t 12000 -k 512 -d 5
+B_sota_dp10.out	./kangsim -m 3 -d 10 -n 32 -t 12000 -k 512
+B_sota_dp12.out	./kangsim -m 3 -d 12 -n 32 -t 12000 -k 512
+B_sota_dp14.out	./kangsim -m 3 -d 14 -n 32 -t 12000 -k 512
+B_sota_dp4.out	./kangsim -m 3 -d 4 -n 32 -t 12000 -k 512
+B_sota_dp6.out	./kangsim -m 3 -d 6 -n 32 -t 12000 -k 512
+B_sota_dp8.out	./kangsim -m 3 -d 8 -n 32 -t 12000 -k 512
+B_sota_js2.out	./kangsim -m 3 -js 2 -n 32 -t 12000 -k 512 -d 5
+B_sota_js4.out	./kangsim -m 3 -js 4 -n 32 -t 12000 -k 512 -d 5
+B_sota_k128.out	./kangsim -m 3 -k 128 -n 32 -t 12000 -d 5
+B_sota_k2048.out	./kangsim -m 3 -k 2048 -n 32 -t 12000 -d 5
+B_sota_k64.out	./kangsim -m 3 -k 64 -n 32 -t 12000 -d 5
+B_sota_k8192.out	./kangsim -m 3 -n 32 -t 20000 -k 8192 -d 5
+B_sota_mirror.out	./kangsim -m 3 -mirror -n 32 -t 20000 -k 512 -d 5
+B_sotap_mirror.out	./kangsim -m 4 -v 2 -mirror -n 32 -t 20000 -k 512 -d 5
+B_sotap_v0.out	./kangsim -m 4 -v 0 -n 32 -t 20000 -k 512 -d 5
+B_sotap_v1.out	./kangsim -m 4 -v 1 -n 32 -t 20000 -k 512 -d 5
+B_sotap_v2.out	./kangsim -m 4 -v 2 -n 32 -t 20000 -k 512 -d 5
+C_3way.out	./kangsim -m 2 -n 48 -t 300 -k 512 -d 14
+C_classic.out	./kangsim -m 1 -n 48 -t 300 -k 512 -d 14
+C_mirror.out	./kangsim -m 6 -n 48 -t 150 -k 512 -d 14
+C_sota.out	./kangsim -m 3 -n 48 -t 300 -k 512 -d 14
+C_sota_M9.out	./kangsim -m 3 -M 9 -n 48 -t 300 -k 512 -d 14
+C_sota_dp12.out	./kangsim -m 3 -n 48 -t 150 -k 512 -d 12
+C_sota_dp12_esc.out	./kangsim -m 3 -d 12 -esc -n 48 -t 200 -k 512
+C_sota_dp14_esc.out	./kangsim -m 3 -d 14 -esc -n 48 -t 200 -k 512
+C_sota_dp14_js4_esc.out	./kangsim -m 3 -n 48 -t 300 -k 512 -d 14 -js 4 -esc
+C_sota_dp16.out	./kangsim -m 3 -n 48 -t 150 -k 512 -d 16
+C_sota_dp16_esc.out	./kangsim -m 3 -n 48 -t 150 -k 512 -d 16 -esc
+C_sota_dp18.out	./kangsim -m 3 -n 48 -t 150 -k 512 -d 18
+C_sota_dp18_esc.out	./kangsim -m 3 -n 48 -t 100 -k 512 -d 18 -esc
+C_sota_dp20.out	./kangsim -m 3 -n 48 -t 80 -k 512 -d 20
+C_sota_dp24.out	./kangsim -m 3 -d 24 -n 48 -t 60 -k 512
+C_sota_js4.out	./kangsim -m 3 -js 4 -n 48 -t 300 -k 512 -d 14
+C_sota_js5.out	./kangsim -m 3 -js 5 -n 48 -t 300 -k 512 -d 14
+C_sota_k2048.out	./kangsim -m 3 -k 2048 -d 12 -n 48 -t 300
+C_sota_k2048_dp14_esc.out	./kangsim -m 3 -k 2048 -d 14 -esc -n 48 -t 200
+C_sota_k32k_dp16_esc.out	./kangsim -m 3 -n 48 -t 300 -k 32768 -d 16 -esc
+C_sota_k8192.out	./kangsim -m 3 -k 8192 -d 11 -n 48 -t 300
+C_sota_k8192_dp12_esc.out	./kangsim -m 3 -n 48 -t 300 -k 8192 -d 12 -esc
+C_sota_mirror.out	./kangsim -m 3 -mirror -n 48 -t 150 -k 512 -d 14
+C_sotap_dp14_esc.out	./kangsim -m 4 -v 2 -d 14 -esc -n 48 -t 200 -k 512
+C_sotap_v2.out	./kangsim -m 4 -v 2 -n 48 -t 300 -k 512 -d 14
+EC_sota_R31_dp12.out	./eckang -m 3 -R 31 -t 30 -d 12
+EC_sota_R31_dp5.out	./eckang -m 3 -R 31 -t 150 -d 5
+EC_sotap_R31_dp5.out	./eckang -m 4 -v 2 -R 31 -t 100 -d 5
+EC_sotap_R32.out	./eckang -m 4 -v 2 -R 32 -t 60 -d 5
+EC_sotap_R32_t30.out	./eckang -m 4 -v 2 -t 30 -R 32 -k 512 -d 5
+
+# --- long-cycle battery (paper §5.4, §6.3): exact commands in simulators/run_cyclog2_battery.sh ---
+cyclog2_ww_n32_t1500.out	./kangsim_diag -m 3 -n 32 -t 1500 -d 5
+cyclog2_ww_n41_t300.out	./kangsim_diag -m 3 -n 41 -t 300 -d 5
+cyclog2_simple_dp14_h512.out	./kangsim_diag -m 3 -n 48 -t 60 -d 14 -cyclog2
+cyclog2_esc_dp14_h512.out	./kangsim_diag -m 3 -n 48 -t 200 -d 14 -esc -cyclog2
+cyclog2_esc_dp14_h2048.out	./kangsim_diag -m 3 -n 48 -t 60 -k 2048 -d 14 -esc -cyclog2
+cyclog2_simple_dp20_h512.out	./kangsim_diag -m 3 -n 48 -t 60 -d 20 -cyclog2
+cyclog2_simple_dp24_h512.out	./kangsim_diag -m 3 -n 48 -t 20 -d 24 -cyclog2
+
+# --- cycle census at solve (paper §5.4) ---
+cyclog_n48_h512_dp12.txt	./kangsim_diag -m 3 -n 48 -t 60 -d 12 -cyclog
+cyclog_n48_h512_dp14.txt	./kangsim_diag -m 3 -n 48 -t 60 -d 14 -cyclog
+cyclog_n48_h2048_dp14.txt	./kangsim_diag -m 3 -n 48 -t 60 -k 2048 -d 14 -cyclog
+
+# --- single-walk band instrument (paper §3.2) ---
+bandm2_r31_M14.txt	./bandm2 -n 32 -M 14 -w 40
+bandm2_r31_M9.txt	./bandm2 -n 32 -M 9 -w 40
+bandm2_r31_M6.txt	./bandm2 -n 32 -M 6 -w 40
+bandm2_r39_M14.txt	./bandm2 -n 40 -M 14 -w 40
+bandm2_r47_M14.txt	./bandm2 -n 48 -M 14 -w 40
+bandm2_esc_r47.txt	./bandm2 -n 48 -M 14 -w 200 -esc -win 48000
+
+# --- 1v1 jump-table-draw sweep (paper §5.7): the 'solved' line of each block ---
+1v1_tabseed_jm<J>.txt	for s in 1 2 3 4: ./kangsim_diag -m 0 -n 32 -t 3000 -jm <J> -ts 0xBBBB000<s>   (J = 0.5, 1, 2, 3, 4)
+
+# --- higher-trial replications (paper §3.4, §5.6): rep2026/ carries its own run scripts
+#     (run_chunks.sh, run_ec.sh, scan_manifest.txt) and pooled summary (POOLED_RESULTS.txt) ---

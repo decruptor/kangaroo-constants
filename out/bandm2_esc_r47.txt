@@ -1,0 +1,2 @@
+# bandm2: n=48 (W=2^47) M=2^14 walks=200 (alternating tame/wild) [esc mode]
+esc-mode window=48000 steps: cycled-within-window=16/200 (tame 5/100 wild 11/100)  NOT cycled=184 (92.0%)

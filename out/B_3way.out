@@ -1,0 +1,5 @@
+# method=3-way n=32 (W=2^31) kang=512 DP=5 M=2^14 trials=20000 v=2 walt=0/1000 mirror=0 jm=2.00
+matches: tw=6899 ww=26202 tt=163229 other=38880 restarts=0 steps=1761207372
+solved 20000/20000  K_main=1.9003 +/- 0.0129 (95%CI)  median=1.7788  sd=0.9320
+dp_rate=1/32.0  matches: tame-wild=6899 wild-wild=26202 tame-tame=163229 other=38880  best |cand-k'|=11665  maxdisp=2.423e+09 (sqrtW=4.634e+04)
+ops_mean=88060 (2^16.43)  DPs_per_kang=5.37  restarts/kang=0.000

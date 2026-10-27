@@ -1,0 +1,6 @@
+# method=(null) n=32 (W=2^31) kang=512 DP=5 M=2^14 trials=20000 v=2 walt=0/1000 mirror=0 jm=2.00
+matches: tw=0 ww=0 tt=49471 other=313101 restarts=58067 steps=1512981650
+solved 20000/20000  K_main=1.6324 +/- 0.0105 (95%CI)  median=1.5416  sd=0.7594
+dp_rate=1/32.1  matches: tame-wild=0 wild-wild=0 tame-tame=49471 other=313101  best |cand-k'|=54947  maxdisp=1.230e+09 (sqrtW=4.634e+04)
+ops_mean=75649 (2^16.21)  DPs_per_kang=4.61  restarts/kang=0.006
+RC formula: DPs_per_kang(ideal)=3.253 -> K=1.3987

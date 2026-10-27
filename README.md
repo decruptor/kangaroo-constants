@@ -1,7 +1,12 @@
 # Kangaroo walk constants for interval ECDLP on secp256k1 — empirical validation
 
 **Author:** Decruptor (pseudonymous)
-**Status:** preprint draft, v0.1. Paper PDF/text: [`paper.md`](paper.md) (one-page version in [`abstract.md`](abstract.md)).
+**Status:** preprint, revised after three referee rounds. Paper text: [`paper.md`](paper.md) (one-page version in [`abstract.md`](abstract.md)).
+
+**Canonical text.** `paper.md` in this repository is the canonical text and is the exact source
+of the revised PDF. An earlier copy of `paper.md` here (first-draft lineage, last edited
+2026-10-24) and the PDFs circulated before this revision had drifted apart; both are
+superseded by this file.
 **ePrint:** [2026/112804](https://eprint.iacr.org/2026/112804)
 
 ## What this is
@@ -62,6 +67,7 @@ precisely why the constant in front of √W matters.
 paper.md          the preprint (markdown, self-contained)
 abstract.md       one-page standalone abstract
 simulators/       the measurement instruments (single-file C, see below)
+out/              raw per-configuration outputs (Appendix A run matrix, 80+ files)
 ```
 
 ## Build and run
@@ -91,19 +97,36 @@ clang -O3 -march=native walktest.c -o walktest -I<openssl>/include -L<openssl>/l
 # Oracle DP-rate uniformity (paper §4.2.3)
 clang -O3 -march=native hashtest.c -o hashtest
 ./hashtest
+
+# Walk-band instrument: per-raw-walk tail/period/band with exact cycle detection;
+# also an escape-rule mode with a finite step window (paper §3.2, §5.4)
+clang -O3 -march=native bandm2.c -o bandm2 -lm
+./bandm2 -n 48 -M 14 -w 200            # band statistics at 2^48
+./bandm2 -n 48 -M 14 -w 200 -esc -win 48000
+
+# Diagnostic simulator: online Brent long-cycle oracle per kangaroo (-cyclog2 —
+# life-end classification, steps-in-cycle share, occupancy by life-step) and
+# solve-channel counters (tame-wild / wild-wild share of solving collisions)
+clang -O3 -march=native kangsim_diag.c -o kangsim_diag -lm
+./kangsim_diag -m 3 -n 32 -t 1500 -d 5 -cyclog2
 ```
 
 Flags (kangsim): `-m` method (0 = 1v1 ideal, 1 = classic herd, 2 = 3-way, 3 = SOTA, 4 = SOTA+,
 6 = mirror), `-v` SOTA+ variant (0/1/2), `-n` log2 interval width, `-t` trials, `-k` herd size,
 `-d` DP bits, `-M` log2 jump-table size, `-w` price the second point, `-mirror` mirror trail,
 `-esc` escape loop handling, `-jm`/`-js` jump-mean/jump-scale sweeps, `-s` seed. Each run fixes
-one seed (default `0xABCDEF0123456789`) and draws fresh jump tables per run; re-running the same
-command reproduces the archived output byte-for-byte.
+one seed (default `0xABCDEF0123456789`) and draws fresh jump tables per run, so re-running a
+command reproduces its output exactly. The command behind every file in `out/` is listed in
+[`out/MANIFEST.txt`](out/MANIFEST.txt).
 
-Note: the sources in `simulators/` were copied from the analysis snapshot (`/tmp/deepdive-sim`,
-2026-10-23). The raw per-configuration outputs (`out/A_*`, `out/B_*`, `out/C_*`, `out/EC_*`,
-independent-tag controls, band sweep) are the paper's Appendix A run matrix; if you want them
-in the repo, copy the `out/` directory from the snapshot next to the sources.
+Note: the sources in `simulators/` were copied from the analysis snapshot (2026-10-23);
+`bandm2.c` and `kangsim_diag.c` were added later for the long-cycle occupancy and solve-channel
+measurements (paper §5.4, §6.3). The first draft's own output files were lost with that
+snapshot's scratch directory before publication. The files in `out/` (`A_*`, `B_*`, `C_*`,
+`EC_*`, independent-tag controls, band sweep, `cyclog2_*`, `bandm2_*`) are re-runs of the
+original commands, made for the revision; each reproduces the value the first draft printed,
+digit for digit in the printed fields. [`FIXLOG.md`](FIXLOG.md) records the re-run triage,
+including a mis-reconstruction of 16 commands in an intermediate revision and its correction.
 
 ## Provenance and attribution
 

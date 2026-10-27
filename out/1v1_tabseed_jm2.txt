@@ -1,0 +1,8 @@
+--- jm=2 ts=0xBBBB0001
+solved 3000/3000  K_main=11.0800 +/- 0.3297 (95%CI)  median=4.1308  sd=9.2135
+--- jm=2 ts=0xBBBB0002
+solved 3000/3000  K_main=3.4707 +/- 0.0547 (95%CI)  median=4.2564  sd=1.5287
+--- jm=2 ts=0xBBBB0003
+solved 3000/3000  K_main=6.9529 +/- 0.1885 (95%CI)  median=5.1766  sd=5.2677
+--- jm=2 ts=0xBBBB0004
+solved 3000/3000  K_main=2.5597 +/- 0.0459 (95%CI)  median=2.3436  sd=1.2823

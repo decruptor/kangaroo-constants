@@ -1,23 +1,25 @@
-# build artifacts
+# build artifacts (compiled simulator binaries; sources ship, binaries do not)
 *.o
-*.out
-kangsim
-kangsim6
-eckang
-walktest
-hashtest
+simulators/kangsim
+simulators/kangsim6
+simulators/kangsim_final
+simulators/kangsim_diag
+simulators/bandm2
+simulators/eckang
+simulators/walktest
+simulators/walktest_x
+simulators/hashtest
 rho_ref*
 rho1
 rho2
-
-# raw run outputs kept out of the paper repo until curated
-out/
 *.log
 
 # editor / OS noise
 .DS_Store
 *~
 
-# compiled binaries
-kangsim_final
-walktest_x
+# rep2026/ run logs are evidence and ship
+!out/rep2026/*.log
+
+# run-progress markers
+.*.done

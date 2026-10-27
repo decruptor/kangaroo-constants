@@ -1,0 +1,25 @@
+# method=SOTA n=48 (W=2^47) kang=512 DP=24 M=2^14 trials=20 v=2 walt=0/1000 mirror=0 jm=2.00
+trial 1: GAVE UP (censored)
+trial 2: GAVE UP (censored)
+trial 3: GAVE UP (censored)
+trial 4: GAVE UP (censored)
+trial 5: GAVE UP (censored)
+trial 7: GAVE UP (censored)
+trial 10: GAVE UP (censored)
+trial 12: GAVE UP (censored)
+trial 13: GAVE UP (censored)
+trial 15: GAVE UP (censored)
+trial 16: GAVE UP (censored)
+trial 17: GAVE UP (censored)
+trial 18: GAVE UP (censored)
+trial 19: GAVE UP (censored)
+cyclog2 lives: short-detect=123722 (100.00%) timeout-in-long-cycle=0 (0.00%) timeout-free=0 (0.00%) exit-while-in-cycle=9115  total=132837
+cyclog2 steps-in-long-cycle / total steps = 87.872%
+cyclog2 first-fires=9166 gap<=16:51 <=256:692 <=65536:8210 >65536:213  fired-in-detect-window=51  lives-ended-short-while-incyc=51
+cyclog2 occupancy (fraction of kangaroos in an undetected long cycle, by life-step): 1000:0.000 2000:0.000 4000:0.001 8000:0.004 16000:0.014 26000:0.037 32000:0.053 64000:0.229 128000:0.748 256000:0.992 512000:1.000 1000000:1.000 2000000:1.000 4000000:1.000
+matches: tw=3 ww=1477 tt=11 other=0 restarts=123722 steps=34851729804
+solved 6/20  K_main=22.9635 +/- 7.4296 (95%CI)  median=28.7931  sd=9.2850
+dp_rate=1/20168825.1  matches: tame-wild=3 wild-wild=1477 tame-tame=11 other=0  best |cand-k'|=23496008710340  maxdisp=1.495e+14 (sqrtW=1.186e+07)
+solves: tame-wild=3 wild-wild=3 other=0  (ww share 50.0%)
+ops_mean=272422128 (2^28.02)  DPs_per_kang=0.56  restarts/kang=40.274
+RC formula: DPs_per_kang(ideal)=0.002 -> K=20.2812

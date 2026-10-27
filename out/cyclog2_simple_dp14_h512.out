@@ -1,0 +1,11 @@
+# method=SOTA n=48 (W=2^47) kang=512 DP=14 M=2^14 trials=60 v=2 walt=0/1000 mirror=0 jm=2.00
+cyclog2 lives: short-detect=43439 (100.00%) timeout-in-long-cycle=0 (0.00%) timeout-free=0 (0.00%) exit-while-in-cycle=1800  total=45239
+cyclog2 steps-in-long-cycle / total steps = 3.112%
+cyclog2 first-fires=1821 gap<=16:21 <=256:223 <=65536:1577 >65536:0  fired-in-detect-window=21  lives-ended-short-while-incyc=21
+cyclog2 occupancy (fraction of kangaroos in an undetected long cycle, by life-step): 1000:0.000 2000:0.000 4000:0.001 8000:0.004 16000:0.014 26000:0.037 32000:0.052 64000:0.241
+matches: tw=42 ww=2423 tt=1884 other=0 restarts=43439 steps=1478747818
+solved 60/60  K_main=2.0775 +/- 0.2335 (95%CI)  median=1.9039  sd=0.9226
+dp_rate=1/16483.8  matches: tame-wild=42 wild-wild=2423 tame-tame=1884 other=0  best |cand-k'|=927488981956  maxdisp=1.495e+14 (sqrtW=1.186e+07)
+solves: tame-wild=42 wild-wild=18 other=0  (ww share 30.0%)
+ops_mean=24645797 (2^24.55)  DPs_per_kang=2.92  restarts/kang=1.414
+RC formula: DPs_per_kang(ideal)=1.626 -> K=1.5976

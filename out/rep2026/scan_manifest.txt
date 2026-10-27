@@ -1,0 +1,23 @@
+# Higher-trial replication of the S3.4 independent-tag control + S5.6 EC SOTA+ discrepancy
+# Fresh seeds for every chunk (original production runs used default 0xABCDEF0123456789, verified by byte-exact reproduction).
+# Chunk = 4000 sim trials / 100 EC trials. .done marker per line; re-running the script resumes.
+# tag|seed|command
+IT_v2|D1CEA001|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEA001
+IT_v2|D1CEA002|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEA002
+IT_v2|D1CEA003|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEA003
+IT_v2|D1CEA004|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEA004
+IT_v2|D1CEA005|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEA005
+IT_v2|D1CEA006|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEA006
+IT_v2|D1CEA007|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEA007
+SH_v2|D1CEB001|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -s D1CEB001
+SH_v2|D1CEB002|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -s D1CEB002
+SH_v2|D1CEB003|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -s D1CEB003
+SH_v2|D1CEB004|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -s D1CEB004
+SH_v2|D1CEB005|./kangsim6 -m 4 -v 2 -n 32 -t 4000 -k 512 -d 5 -s D1CEB005
+IT_v0|D1CEC001|./kangsim6 -m 4 -v 0 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEC001
+IT_v0|D1CEC002|./kangsim6 -m 4 -v 0 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEC002
+IT_v0|D1CEC003|./kangsim6 -m 4 -v 0 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEC003
+IT_v0|D1CEC004|./kangsim6 -m 4 -v 0 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEC004
+IT_v0|D1CEC005|./kangsim6 -m 4 -v 0 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEC005
+IT_v0|D1CEC006|./kangsim6 -m 4 -v 0 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEC006
+IT_v0|D1CEC007|./kangsim6 -m 4 -v 0 -n 32 -t 4000 -k 512 -d 5 -it -s D1CEC007

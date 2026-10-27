@@ -1,41 +1,43 @@
 # An empirical analysis of Pollard-kangaroo walk constants for interval ECDLP on secp256k1, including the unpublished SOTA family
 
-**Status:** preprint, prepared for submission to IACR ePrint.
-**Author:** Decruptor (pseudonymous) — the simulation and analysis tooling was produced with the assistance of Claude Code; see §Acknowledgements.
-**Date:** 2026-10-23. **Code and raw data:** `/tmp/deepdive-sim` snapshots referenced in Appendix A; the artifacts analyzed here are third-party (RetiredCoder) plus the authors' simulator.
+**Status:** preprint.
+**Author:** Decruptor (pseudonymous), contact: decruptor@proton.me — the simulation and analysis tooling was produced with the assistance of Claude Code; see §Acknowledgements.
+**Date:** 2026-10-26. **Code and raw data:** https://github.com/decruptor/kangaroo-constants (simulator, snapshots and raw run outputs; Appendix A); the artifacts analyzed here are third-party (RetiredCoder) plus the authors' simulator.
 
 ---
 
 ## Abstract
 
-We report what is, to our knowledge, the first independent, large-sample validation of the walk
-constants of the "SOTA" and
+We report the first independent, large-sample validation of the walk constants of the "SOTA" and
 "SOTA+" kangaroo methods for interval ECDLP on secp256k1 — an unpublished family due to RetiredCoder
 (RC) that underlies the fastest publicly known solvers for the Bitcoin-puzzle ranges. Using a
 hash-oracle model of the group, we run ~5.1·10^5 full DLP solves across 70 configurations at
 interval widths 2^31–2^47 and reproduce all published constants: SOTA **K = 1.15** (measured
 1.1537 ± 0.0195 at the exact Kang-1 configuration), SOTA+ **1.02 / 1.05 / 0.99** (measured 1.0242,
-1.0548, 1.0093, each ± 0.017–0.018), classic ≈ 2.1 and 3-way ≈ 1.6. We validate RC's
-distinguished-point overhead formula `K = 1.15 + (0.07 + 0.76/√DPK)/(1 + 0.30·DPK)` — residuals
-≤ 2.5% over DPK ∈ [0.025, 74] at the calibration herd and range — and chart its failure regimes
-quantitatively.
+1.0548, 1.0093, each ± 0.018), classic ≈ 2.1 and 3-way ≈ 1.6. We validate RC's distinguished-point
+overhead formula `K = 1.15 + (0.07 + 0.76/√DPK)/(1 + 0.30·DPK)` over DPK ∈ [0.025, 74] — three and
+a half orders of magnitude — and chart its failure regimes quantitatively.
 
-The mechanism analysis has three parts. (i) *Walk confinement:* the SOTA walk is not a diffusion;
-its displacement saturates at a band of ≈ 350–800·√W within ~10^3–10^4 steps, which explains why
-reduced start ranges (tames in the bottom W/32 of the interval) still work and why loop handling,
-not range size, governs large-range behavior. (ii) *Selection-rule biasing:* the SOTA+ branch tag
+The mechanism analysis has three parts. (i) *Walk confinement and cycling:* the SOTA walk is a
+deterministic map, not a diffusion — every trajectory is eventually periodic: displacement grows
+for 10^2–10^4 steps (the tail grows with both range width and jump-table size, the latter
+capped at large tables by the L1S2 bounce — §3.2) and then
+freezes exactly at cycle entry into a band of ≈ 10^2–2·10^3·√W, with typically short cycles
+(median period 2) and a heavy tail to 10^4. This explains why reduced start ranges (tames in the
+bottom W/32 of the interval) still work and why loop handling, not range size, governs
+large-range behavior. (ii) *Selection-rule biasing:* the SOTA+ branch tag
 shares low bits with the jump index and the DP test, so the selection rule concentrates the walk on
 distinguished states; we derive the resulting per-step DP rate exactly (1/18.29 predicted vs
 1/18.3 measured for the GPU rule) and an empirical Herfindahl law K/K_SOTA ≈ √(H_unif/H_sel) that
 reproduces all SOTA+ constants to ≤ 1%. (iii) *Decomposition:* re-keying the branch tag to an
 independent hash collapses the DP rate to exactly 1/32 and removes precisely the DP-overhead share
-of the gain, while the concentration share survives (10.0% of the 17.8% total SOTA+ gain at
-2^31/dp5; statistically inseparable at the Kang-1 configuration, Δ = 0.003 ± 0.024). A 200-trial pilot of this control
+of the gain, while the concentration share survives (10.0% vs 17.8% at 2^31/dp5; statistically
+inseparable at the Kang-1 configuration, Δ = 0.003 ± 0.024). A 200-trial pilot of this control
 suggested the opposite conclusion and is documented as a methodological warning.
 
 We quantify two fragility conditions: loop handling (naive "restart on revisit" degrades 1.15 →
 1.95 at 2^47, and to 4.7 with a small jump table) and herd-size scaling (the DP formula holds only
-while wild starts tile the interval at least as densely as the saturation band; at 2^47 with 512
+while wild starts tile the interval at least as densely as the cycle-entry band; at 2^47 with 512
 kangaroos and DP bits 24, 48 of 60 trials fail outright). Two negative results: a correlated
 "mirror" second walking sample gains ≤ 3.6% ± 1.3% at zero marginal cost and is unprofitable at any
 physically realizable price; and 1-D endomorphism-accelerated walks (Galbraith–Ruprai style) are
@@ -104,16 +106,15 @@ another person's README. Someone had to, and the queue was short.
    one-parameter Herfindahl scaling law, once the DP overhead is accounted with RC's own formula.
 
 3. **Validation and delimitation of RC's DP-overhead formula** (§5.3). The formula reproduces our
-   measurements within ~2.5% over its designed domain — at the calibration herd (h = 512):
-   DPK = ideal DPs per kangaroo ∈ [0.025, 6.5] at interval 2^31 and DPK = 74 at the Kang-1
-   configuration (2^40) — and within ~2% at interval 2^47 for herds of 2048–8192 kangaroos; we chart
-   where it fails (+8–13% at
+   measurements within ~2.5% over DPK = ideal DPs per kangaroo ∈ [0.025, 74] at interval 2^31 and
+   within ~2% at interval 2^47 for sufficiently large herds; we chart where it fails (+8–13% at
    2^47 with 512 kangaroos and DP bits ≤ 14; growing failures at DP bits ≥ 18; −22% at 32 768
    kangaroos) and identify the geometric quantity that governs the failures (wild-start spacing vs
-   walk saturation band, §5.5).
+   the walk's cycle-entry band, §5.5).
 
-4. **Mechanism analysis** (§3.2, §3.3, §3.4): walk confinement (saturation band measured at
-   ≈ 350–800·√W for jump tables 2^12–2^16, saturating within ~10^3–10^4 steps), the exact
+4. **Mechanism analysis** (§3.2, §3.3, §3.4): walk confinement and eventual periodicity (the
+   cycle-entry band measured at 119–2114·√W across r = 31–47 and M = 2^6–2^14, tails μ of
+   10^2–3·10^4 steps, median cycle period 2), the exact
    selection-induced DP-rate identities, the Herfindahl scaling, and a control experiment that
    decomposes the SOTA+ gain into a concentration component (survives an independent-hash tag) and
    a DP-rate component (vanishes: 1/18.3 → 1/32.0, exactly).
@@ -129,7 +130,7 @@ another person's README. Someone had to, and the queue was short.
 
 7. **Honest accounting of SOTA+** (§7.2): the second point must cost < 0.14–0.22 op/step to beat
    plain SOTA. This holds when inversion dominates the step cost (unbatched CPU arithmetic:
-   extra ≈ 0.01–0.05 op) and fails when inversion is batched away (GPU: extra ≈ 0.3–0.7 op). RC's
+   extra ≈ 0.01–0.03 op) and fails when inversion is batched away (GPU: extra ≈ 0.3–0.7 op). RC's
    own GPU implementation ships plain SOTA, not SOTA+ — we verify this in the kernel source — so
    the GPU-relevant constant is 1.15, not 0.99.
 
@@ -151,7 +152,7 @@ family have a demonstrated habit of improving whenever someone declares a floor.
 ### 2.1 Interval ECDLP and kangaroo methods
 
 Let G generate a cyclic group of prime order n (for secp256k1, n ≈ 2^256), and let Q = kG with
-k ∈ [a, a+W). Pollard's kangaroo method [Pollard 1978; Pollard 2000] runs two "kangaroos": a *tame* starting at a
+k ∈ [a, a+W). Pollard's kangaroo method [Pollard 1978] runs two "kangaroos": a *tame* starting at a
 known multiple tG and a *wild* starting at Q + offset. Both perform pseudo-random walks with jumps
 drawn from a fixed table {J_0, …, J_{M-1}} of known multiples of G; the jump index is a
 deterministic function of the current point (in practice, low bits of the x-coordinate modulo M).
@@ -167,14 +168,18 @@ directed walk, while the DP storage requirement scales as √W/2^d for DP bits d
 
 Galbraith, Pollard and Ruprai [GPR 2010] introduced multi-herd variants: four herds (tame, wild,
 and their negations, with a halved wild range) give K = 1.715 + o(1); a Gaudry–Schost-flavoured
-variant gives 1.661 + o(1). Galbraith and Ruprai [G-R 2010] applied *equivalence classes* — orbits
-under an efficiently computable endomorphism — to the interval DLP and obtained ≈ 1.36√N for groups
-with fast inversion, while noting explicitly that it "seems impossible" to combine equivalence
+variant gives 1.661 + o(1). Galbraith and Ruprai [G-R 2010] applied *equivalence classes* —
+most importantly point negation; their "fast inversion" is the availability of cheap point
+negation (computing −P as a group operation), unrelated to batched *field* inversion (§6.2) —
+to the
+interval DLP and
+obtained ≈ 1.36√N for groups
+with cheap point negation, while noting explicitly that it "seems impossible" to combine equivalence
 classes with the standard kangaroo method, and that in practice their algorithm runs slower than
 its constant because walks leave the search space and fruitless cycles must be handled. To our
 knowledge no published method for a *1-dimensional* walk has a constant below ≈ 1.36, and no
 published analysis supports a constant below ≈ 1.25 for any variant; a community-circulated
-unpublished preprint claims a floor/attainment of √(π/2) ≈ 1.2533 for 1-D walks (§6.3).
+unpublished preprint claims a floor of √(π/2) ≈ 1.2533 for 1-D walks (§6.3).
 
 ### 2.2 The SOTA family (RetiredCoder, unpublished)
 
@@ -190,8 +195,9 @@ demonstrator with five methods; we quote its README:
 > so let's assume that I invented it :)
 > **6 – SOTA+.** … also uses cheap second point. When we calculate `NextPoint = PreviousPoint +
 > JumpPoint` we can also quickly calculate `PreviousPoint - JumpPoint` because inversion is the
-> same. … K is approximately 1.02 … Or you can pay 1MUL+1SQR and get K about 0.99 (preferable for
-> GPU implementation). Or you can pay only (1MUL+1SQR)/4 and get K about 1.05.
+> same. … Using cheap point costs only (1MUL+1SQR)/2. … K is approximately 1.02 for this method
+> (assuming cheap point is free and not counted as 1op). Or you can pay 1MUL+1SQR and get K about
+> 0.99 (preferable for GPU implementation). Or you can pay only (1MUL+1SQR)/4 and get K about 1.05.
 
 Part 2 (Kang-2) [RC, Kang-2] documents the loop-handling problem and RC's "advanced" chain-preserving
 solution (a second jump table with larger jumps used to exit small even-size loops without breaking
@@ -211,12 +217,13 @@ walk statistics existed before this work.
 
 W = 2^r is the interval width; √W = 2^(r/2). h = number of kangaroos ("herd size"), h/3 tame and
 2h/3 wild in the SOTA family. d = DP bits; a DP is a point whose x-coordinate is 0 mod 2^d. M = 2^m
-is the jump-table size; jump j_i ∈ [2^(⌊r/2⌋+3), 2^(⌊r/2⌋+4)) (mean 1.5·2^(⌊r/2⌋+3) = 12√W at even
-r; the implementation floors r/2, so odd-r runs sit half an octave lower — minjump 2^18, mean
-8.5√W at r = 31, the geometry of §3.2 and of the paired EC runs of §4.2.2), even for all
+is the jump-table size; jump j_i ∈ [2^(⌊r/2⌋+3), 2^(⌊r/2⌋+4)) (mean 1.5·2^(⌊r/2⌋+3), which equals
+12√W at even r and 8.49√W at odd r — the implementation floors r/2 in the shift), even for all
 SOTA-family methods. DPK = 1.15·√W/(h·2^d) is RC's "ideal DPs per kangaroo" load parameter. K =
 (expected total group operations)/√W; all K quoted as mean ± 95% CI over independent trials
-(uniform random k per trial, fresh jump tables per program run).
+(uniform random k per trial, fresh jump tables per program run). We write n = r+1 for the bit
+length of the group order (the simulator's range parameter); the curve order itself is never
+needed explicitly.
 
 ---
 
@@ -264,48 +271,78 @@ implements):
     smaller than the main candidate's x mod 4.
 
   In all three variants the second point is *not counted as an operation* in Kang-1's op counter;
-  the README prices it separately as (1MUL+1SQR)/4, (1MUL+1SQR) or free. §7.2 prices it honestly.
+  the README prices the variants at (1MUL+1SQR)/2 (K ≈ 1.02 — the v0 rate: the alternative is
+  computed on the half of steps whose main candidate has odd x), (1MUL+1SQR)/4 (K ≈ 1.05) and
+  (1MUL+1SQR) (K ≈ 0.99). §7.2 prices it honestly.
 
-### 3.2 The walk is confined: the saturation band
+### 3.2 The walk is confined — and then it cycles
 
 The adaptive-sign walk is *not* a random walk with independent increments. The sign s at each
 position is a deterministic function of the canonical position, and consecutive signed jumps are
-strongly anti-correlated: in our EC walk diagnostics the per-step sign-flip rate is 0.597, well
-above a fair coin's 0.5, and the anti-correlation extends to the jump magnitudes as well (the Z/p
-model's antisymmetric-hash sign bit flips at 0.498 — indistinguishable from a fair coin — yet the
-model reproduces the confinement; §4.2.1). The consequence is striking enough that we re-checked it
-three separate ways,
+strongly anti-correlated: in our EC and Z/p walk diagnostics the per-step sign-flip rate is
+0.50–0.60 (a fair independent coin gives 0.5, but the anti-correlation extends to the jump
+magnitudes as well). The consequence is striking enough that we re-checked it three separate ways,
 and as far as we know it was undocumented in the community literature before this work:
 
-**Empirical fact 3.1 (confinement).** The SOTA walk's displacement |dist| grows only for the first
-~10^3–10^4 steps and then saturates at a *band* B(M) of width a few hundred √W, independently of
-step count thereafter. Measured in the Z/p model at r = 31 (minjump 2^18: jumps in [5.7, 11.3)·√W,
-mean 8.5√W; §2.3 floor convention):
+**Empirical fact 3.1 (confinement and eventual periodicity).** The SOTA walk is a *deterministic
+map* on the position x — the next state is x ± jmpdist[idx(x)], with the sign read off x — so on a
+finite state space every trajectory is eventually periodic, and so is the displacement record. We
+rebuilt the first draft's band instrument accordingly (`bandm2.c`, Appendix A): Brent cycle
+detection on the exact Z/p trajectory (40 alternating tame/wild walks per configuration, jump
+table as in §5), reporting per walk the tail μ (steps to cycle entry), the cycle period λ, the
+displacement band max dist − min dist over the full trajectory, and the band growth over one extra
+period as a periodicity check:
 
-| M (jump table) | mean \|dist\| after 10^3 steps | after 10^4 | after 10^5 | after 10^6 |
+| configuration | tail μ, mean (median) | period λ, mean (median) | band at cycle entry | band growth over +1 period |
 |---|---|---|---|---|
-| 2^6  | 67√W  | 74√W  | 78√W  | 56√W  |
-| 2^8  | 119√W | 124√W | 136√W | 179√W |
-| 2^10 | 187√W | 233√W | 268√W | 297√W |
-| 2^12 | 208√W | 366√W | 341√W | 335√W |
-| 2^14 (default) | 191√W | 489√W | 377√W | 352√W |
-| 2^16 | 201√W | 413√W | 507√W | 406√W |
+| r=31, M=2^6 | 109 (72) | 2 (2) | 119√W | 0 (all 40 walks) |
+| r=31, M=2^9 | 906 (630) | 191 (2) | 367√W | 0 |
+| r=31, M=2^14 | 3492 (2451) | 1428 (577) | 897√W | 0 |
+| r=39, M=2^14 | 15 706 (14 366) | 1485 (2) | 1648√W | 0 |
+| r=47, M=2^14 | 26 803 (20 933) | 780 (2) | 2114√W | 0 |
 
-(mean over 40 independent walks; max|dist| runs ≈ 1.5–1.9× the mean; the "band" quoted throughout
-the paper is this mean-saturation value). The band grows sublinearly in
-M — a power-law fit gives B ∝ M^0.4–0.5 — and is only weakly dependent on the step count beyond
-10^4 (the largest drift in the sweep is the 2^8 row's 124→179√W from 10^4 to 10^6 steps; most rows
-are flat or declining). For reference, an unbiased sign process would give a diffusive √t growth:
-after 10^6 steps the rms displacement would be ≈ 8.5√W·10^3 ≈ 8.5·10^3√W, more than an order of
-magnitude larger than observed.
+Three readings. (i) The "saturation band" is the *pre-cycle* displacement: the walk wanders for μ
+steps — μ grows with *both* r and M (109 → 906 → 3 492 as M goes 2^6 → 2^9 → 2^14 at r = 31;
+3 492 → 26 803 from r = 31 to 47 at M = 2^14) — then
+enters a cycle. The cycle is typically short (median λ = 2 in four of the five configurations: the
+L1S2 two-point bounce) with a heavy tail out to λ ≈ 1.6·10^4. After cycle entry the band freezes
+exactly: growth over one extra period is 0.000 for all 200 walks measured.
+
+The M-direction has a clean mechanism that ties four otherwise separate numbers together: at
+large r the tail is *capped by the L1S2 bounce*. The λ = 2 two-point bounce occurs with
+probability ≈ 1/(2M) per step, so the time to the first bounce is exponential with mean 2M —
+at M = 2^14 a mean of 32 768 steps and a median of 22.7k, against the measured r = 47 tail
+median of 20 933. The λ-median-2 rows at r = 39 and r = 47 are this bounce, and §5.4's "≈ 1
+event per 3·10^4 steps" is the same 1/32 768 seen from the herd side. So the tail grows
+roughly linearly in M at large r, and its growth with r flattens once μ reaches ≈ 2M. The
+chain-preserving escape rule removes the cap: in escape-rule bandm2 runs at r = 47, M = 2^14,
+184 of 200 walks had not cycled within 48 000 steps (raw-walk comparison: all 40-walk
+cohorts cycle, median 20 933; `bandm2 -esc -win 48000`, Appendix A).
+
+(ii) The first draft's
+step-budget table (mean |dist| after 10^3/10^4/10^5/10^6 steps) is a censored view of the same
+phenomenon: a budget beyond μ simply retraces the cycle, so the plateau — and its
+non-monotonicities (74√W → 56√W at M = 2^6) — is cycle noise, not a saturation law. In bandm2's
+band normalization the same budgets read 444 / 893 / 897 / 897√W at r = 31, M = 2^14: identical
+beyond 10^4 because those walks have already cycled. (iii) The cycle-entry band grows sublinearly
+in M but admits no clean power law (pairwise M-exponents 0.54 for 2^6 → 2^9 and 0.26 for
+2^9 → 2^14 at r = 31; the first draft's B ∝ M^0.4–0.5 fit sat inside this spread, but its
+precision was spurious). For reference, an unbiased sign process would give diffusive √t growth —
+≈ 8.5·10^3√W after 10^6 steps at r = 31, more than an order of magnitude above any observed band.
 
 **Consequences.** (a) *Start ranges can be tiny.* A kangaroo explores only a band around its
 start, so the herd must be pre-positioned across the interval rather than allowed to diffuse:
 this is why tame range W/32 and wild range 1.0625·W suffice, and why herd geometry (§5.5), not
-walk length, governs the constant. (b) *Loops are inevitable at scale.* Beyond saturation every
-step revisits territory; small even-size loops (size 2 above all) occur at a rate set by M alone
-(RC reports L1S2 ≈ 1/1024 jumps at M = 512) and accumulate linearly — the mechanism behind §5.4's
-fragility results and RC's Kang-2 observation that naive loop handling degrades K at high ranges.
+walk length, governs the constant. (b) *Cycling, not saturation, is the large-range regime.* Past
+cycle entry every step revisits territory. Cycles with λ ≤ 16 are caught by the 16-deep
+displacement history — and the λ = 2 bounce (L1S2) occurs at a rate set by M alone (RC reports
+≈ 1/1024 jumps at M = 512) — while long cycles (λ up to 10^4) are invisible to any 16-deep
+detector and simply waste steps until the 20·2^d DP-timeout restart. How much that costs depends
+on the DP density: at low DP density (dp ≳ 18 at n = 48) the timeout exceeds the kangaroo's whole
+step budget and long cycles become permanent (§5.4 measures this); at high DP density (dp ≤ 14)
+DP inserts reset the detectors and the §5.4 residuals are dominated by herd geometry (§5.5), with
+undetected long cycles a few-percent contributor (§5.4) — and RC's Kang-2 observation that naive
+loop handling degrades K at high ranges.
 (c) *Uniform DP density comes only from pre-positioning*, which is why the DP-overhead accounting
 (§5.3) transfers across ranges only when the herd scales correctly.
 
@@ -329,7 +366,7 @@ on {0,1,2,3} (a Null model we validate below), the rule-induced distribution π 
 | SOTA+ v1 | main ≡ 3 (mod 4) → alt if alt ≢ 3 | 5/16 | 5/16 | 5/16 | 1/16 | 0.296875 | 1/25.60 | 1/25.6 |
 | SOTA+ v2 | always min-tag | 7/16 | 5/16 | 3/16 | 1/16 | 0.328125 | 1/18.29 | 1/18.3 |
 | SOTA + mirror add-on | second unconditioned trail | — | — | — | — | — | 1/16.00 | 1/16.0 |
-| SOTA+ v2 + mirror | always min-tag (as v2) | — | — | — | — | — | 11/128 = 1/11.64 | 1/11.6 |
+| SOTA+ v2 + mirror | | — | — | — | — | — | 11/128 = 1/11.64 | 1/11.6 |
 
 Every entry of the last two columns is an exact combinatorial identity of the Null model (DP ⟺
 low d bits zero ⟹ tag = 0; the unshared d−2 bits remain uniform), and all six measured rates match
@@ -358,16 +395,20 @@ measurements to ≤ 1%: predicted 1.1964 / 1.2567 / 1.1473 vs measured 1.1968 / 
 (residuals +0.03%, +0.8%, +0.4%). At 2^40 (dp 5, DPK = 73.6, overhead < 1%) the raw agreement is
 already ≤ 0.8%.
 
-**Honesty about Law 3.2.** We do not have a first-principles derivation of the exponent. A naive
-birthday computation with stationary visit measures gives the same √(H_unif/H) scaling as the law
-(for v2, 1/√(4H) = 0.873 vs 0.87 measured) — it is not an independent check, because stationary
-occupancy weights revisits exactly as the law's form assumes, whereas a first-principles argument
-would have to sample fresh draws; the √(H) law is a phenomenological fit with six
-in-range verifications and two out-of-sample validations (the EC cross-checks of §5.6 and the
-mirror combinations). Its sharpest structural test — re-keying the tag to an independent hash,
-which leaves H unchanged — is passed: §3.4 shows the law holds in the control world to +0.7%,
-which is why we present the concentration and DP-synergy components as separate, individually
-validated effects rather than one mechanism.
+**Honesty about Law 3.2.** The law is the textbook birthday substitution made explicit. Suppose
+the walk's visits put mass π_c on each of the four tag classes, each class holding N/4 of the
+states, with visits uniform within a class. Two independent visits then collide with probability
+Σ_x p(x)² = 4·(Σ_c π_c²)/N = 4H/N instead of the uniform 1/N, and the birthday meeting cost scales
+as the reciprocal square root of the collision probability: K/K_SOTA → 1/√(4H). Since H_unif = 1/4,
+the normalization is exact, and for v2 (H = 0.328125) the heuristic gives 0.873 — precisely Law
+3.2. What the birthday argument does *not* derive is its own premise: that the walk's *visit*
+masses equal the static selection-class masses π_c of §3.3's table, and that fresh-draw (rather
+than stationary-revisit) statistics govern the meeting process. We therefore present the law as a
+phenomenological fit with six in-range verifications and two out-of-sample validations (the EC
+cross-checks of §5.6 and the mirror combinations). Its sharpest structural test — re-keying the
+tag to an independent hash, which leaves H unchanged — is passed: §3.4 shows the law holds in the
+control world to +0.7%, which is why we present the concentration and DP-synergy components as
+separate, individually validated effects rather than one mechanism.
 
 ### 3.4 Control experiment: independent-hash branch tag
 
@@ -389,22 +430,25 @@ drives it, the gain should vanish and the DP rate must return to 1/2^d.
 
 † Pooled over the original production run (default seed) and a fresh-seed replication to ≥ 40 000
 trials per configuration (Appendix A); the CIs are random-effects 95% intervals that include the
-between-seed jump-table component of §4.4.2, estimated at τ = 0.005–0.012 across the three arms.
+between-seed jump-table component of §4.4, estimated at τ = 0.005–0.012 across the three arms.
+For the v0 arm the between-seed component is the largest: the archived 12 000-trial production run
+gave 1.2626 (default seed) while the seven fresh-seed chunks give per-seed means 1.2787–1.2992
+(pooled 1.2840) — a ≈ 2% run-level effect from the jump-table draw that within-run CIs do not
+capture (§4.4).
 Elsewhere in the paper (§3.3, §5.1, §5.6, §6, §7) the shared-tag row is quoted from the original
 production run alone (20 000 trials, 1.1522 ± 0.0079); the pooled value 1.1499 ± 0.0095 is
 statistically indistinguishable from it.
 
 Three findings. (i) The DP-rate elevation is *entirely* a bit-sharing effect: with an independent
 tag the DP rate returns to exactly 1/32.0 under both rules. (ii) The concentration gain survives:
-at 2^31 the independent-tag K (1.2606) is 10.0% below SOTA (the full shared-tag gain is 17.8%),
-and Law 3.2 plus RC's overhead formula
+at 2^31 the independent-tag K (1.2606) is 10.0% below SOTA, and Law 3.2 plus RC's overhead formula
 at the *uniform* DP rate predicts 1.2525 for it (+0.7% residual) — the same law that predicts the
 shared-tag run to +0.2%. The gain therefore does **not** require bit-sharing. (iii) What bit-sharing
 buys is precisely the DP-rate elevation, and its value is the DP-overhead share of K: measured
 shared-vs-independent gap 0.111 ± 0.012 at 2^31/dp5 vs 0.105 predicted from the overhead formula; at the
 Kang-1 configuration (dp 5, DPK = 73.6, overhead < 1%) the gap is 0.003 ± 0.024 — statistically
-zero. In sparse-DP regimes the gap grows with the overhead term (predicted ≈ 1.17 at 2^31/dp12,
-from the overhead formula at the uniform vs effective DPK), never dominating.
+zero. In sparse-DP regimes the gap grows with the overhead term (predicted 0.14 at 2^31/dp12),
+never dominating.
 
 **A methodological warning we inflicted on ourselves.** A 200-trial pilot of the independent-tag
 run gave K = 1.3264 ± 0.0847, which reads as "the gain mostly vanishes" — the conclusion we
@@ -415,8 +459,7 @@ conclusions about few-percent effects. We publish the pilot number next to the r
 hope that the next person tempted by n = 200 finds this paragraph first.
 
 Revised conclusion: **the SOTA+ advantage decomposes into a selection-induced concentration of the
-walk (present for any position-derived tag; 12% of K at ideal — independent-tag ideal-equivalent
-1.012 vs 1.15) and a tag⊗DP bit-sharing synergy
+walk (present for any position-derived tag; 12–12.7% of K at ideal) and a tag⊗DP bit-sharing synergy
 that raises the DP rate to exactly predictable values and is worth exactly the DP-overhead share
 it removes.** Implementations may substitute an independent tag source only if they do not care
 about DP density; the concentration half of the benefit is retained.
@@ -461,48 +504,44 @@ real birthday events the experiment measures.
 
 Three instruments connect the model to the real curve:
 
-### 4.2.1 `walktest.c` — single-walk statistics on real secp256k1 (OpenSSL) vs the model
+1. **`walktest.c` — single-walk statistics on real secp256k1 (OpenSSL) vs the model.** Identical
+   walk rule (index = x mod M, sign = y parity antisymmetric, jumps even in [2^(r/2+3), 2^(r/2+4))),
+   10^5 steps × 20 trials at r = 32: EC mean |dist| 3.43·10^7 vs model 4.01·10^7 (max |dist|
+   1.54·10^8 vs 1.66·10^8); sign-flip rate 0.597 (EC) vs 0.498 (model) per step; both far from the
+   diffusive expectation 2.49·10^8. Both walks are confined, with the model ~17% wider on this
+   sample; §4.4 treats this as the model's main quantitative deviation.
 
-Identical walk rule (index = x mod M, sign = y parity antisymmetric, jumps even in [2^(r/2+3),
-2^(r/2+4))), 10^5 steps × 20 trials at r = 32: EC mean |dist| 3.43·10^7 vs model 4.01·10^7 (max
-|dist| 1.54·10^8 vs 1.66·10^8); sign-flip rate 0.597 (EC) vs 0.498 (model) per step; both far from
-the diffusive expectation 2.49·10^8. Both walks are confined, with the model ~17% wider on this
-sample; §4.4 treats this as the model's main quantitative deviation.
+2. **`eckang.c` — full DLP solves on real secp256k1.** A line-by-line EC re-implementation of the
+   SOTA and SOTA+ methods using OpenSSL affine arithmetic, with the SOTA+ step computing *both*
+   branches from one inversion of (x_J − x_P), exactly as RC's `AddPointsAndGetInv` does. Runs at
+   r = 31 (exactly matching the Z/p n = 32 runs' geometry, including minjump = 2^18 and the W/32
+   shift):
 
-### 4.2.2 `eckang.c` — full DLP solves on real secp256k1
+   | EC run (r = 31, h = 512) | K (real secp256k1) | paired Z/p measurement | σ of difference |
+   |---|---|---|---|
+   | SOTA, dp 5, 150 trials | 1.4162 | 1.4012 ± 0.0091 | 0.28σ |
+   | SOTA+ v2, dp 5, 500 trials | 1.0929 | 1.1522 ± 0.0079 | **2.5σ** (see below) |
+   | SOTA, dp 12, 30 trials | 6.4012 | 5.8106 ± 0.0472 | 1.2σ |
 
-A line-by-line EC re-implementation of the SOTA and SOTA+ methods using OpenSSL affine arithmetic,
-with the SOTA+ step computing *both* branches from one inversion of (x_J − x_P), exactly as RC's
-`AddPointsAndGetInv` does. Runs at r = 31 (exactly matching the Z/p n = 32 runs' geometry,
-including minjump = 2^18 and the W/32 shift):
+   (SEs use the Z/p per-trial standard deviation at the same configuration: 0.66 for SOTA dp5,
+   0.53 for SOTA+ dp5, 2.64 for dp12.) The SOTA and dp12 comparisons validate the model. The
+   SOTA+ point is 2.5σ *below* the model — and the real-curve runs agree with each other across
+   five independent seeds (the original 100 trials at 1.0420, plus four fresh-seed 100-trial
+   replications at 1.0791 / 1.1447 / 1.0712 / 1.1274, pooled to 1.0929 over 500 trials; earlier
+   r = 32 runs: 1.0512, 30 trials; 1.0395, 60 trials), so the discrepancy is stable, not a single
+   fluke. Two readings: a heavy-tail artifact of small samples — now disfavored, since the pooled
+   500-trial mean (1.0929) sits only 5.1% below the model and the four fresh-seed chunk means
+   scatter consistently with the Z/p per-trial sd — or a genuine small extra benefit of the
+   *algebraic* (non-random) low-bit oracle for the selection
+   rule — the real curve relates consecutive positions' low bits through λ² = x′ + x + x_J, a
+   structure our random oracle destroys, and a structure that could strengthen the DP-seeking
+   dynamics of §3.3. We flag it as an open discrepancy; it does not affect any conclusion that
+   rests on the Z/p instrument, and it makes our SOTA+ claims conservative (the real curve appears
+   if anything slightly better than modeled).
 
-| EC run (r = 31, h = 512) | K (real secp256k1) | paired Z/p measurement | σ of difference |
-|---|---|---|---|
-| SOTA, dp 5, 150 trials | 1.4162 | 1.4012 ± 0.0091 | 0.28σ |
-| SOTA+ v2, dp 5, 500 trials | 1.0929 | 1.1522 ± 0.0079 | **2.5σ** (see below) |
-| SOTA, dp 12, 30 trials | 6.4012 | 5.8106 ± 0.0472 | 1.2σ |
-
-(SEs use the Z/p per-trial standard deviation at the same configuration: 0.66 for SOTA dp5,
-0.53 for SOTA+ dp5, 2.64 for dp12.) The SOTA and dp12 comparisons validate the model. The
-SOTA+ point is 2.5σ *below* the model — and the real-curve runs agree with each other across
-five independent seeds (the original 100 trials at 1.0420, plus four fresh-seed 100-trial
-replications at 1.0791 / 1.1447 / 1.0712 / 1.1274, pooled to 1.0929 over 500 trials; earlier
-r = 32 runs: 1.0512, 30 trials; 1.0395, 60 trials), so the discrepancy is stable, not a single
-fluke. Two readings: a heavy-tail artifact of small samples — now disfavored, since the pooled
-500-trial mean (1.0929) sits only 5.1% below the model and the four fresh-seed chunk means
-scatter consistently with the Z/p per-trial sd — or a genuine small extra benefit of the
-*algebraic* (non-random) low-bit oracle for the selection
-rule — the real curve relates consecutive positions' low bits through λ_J² = x′ + x + x_J, a
-structure our random oracle destroys, and a structure that could strengthen the DP-seeking
-dynamics of §3.3. We flag it as an open discrepancy; it does not affect any conclusion that
-rests on the Z/p instrument, and it makes our SOTA+ claims conservative (the real curve appears
-if anything slightly better than modeled).
-
-### 4.2.3 `hashtest.c` — oracle uniformity
-
-Over 10^7 canonical forms: DP-rate for a 5-bit mask 1/32.06 (nominal 1/32) and for a 20-bit mask
-1/909091 (nominal 1/1048576); the 20-bit estimator is within its Poisson 1σ (expected 9.5 hits,
-observed 11). The model oracle is uniform.
+3. **`hashtest.c` — oracle uniformity.** Over 10^7 canonical forms: DP-rate for a 5-bit mask
+   1/32.06 (nominal 1/32) and for a 20-bit mask 1/909091 (nominal 1/1048576); the 20-bit estimator
+   is within its Poisson 1σ (expected 9.5 hits, observed 11). The model oracle is uniform.
 
 ### 4.3 Configurations
 
@@ -522,9 +561,6 @@ minjump multiplier 2^(r/2+js) for js ∈ {2,3,4,5}; mean-jump sweep for the 1v1 
 the cap are *censored* and excluded from the mean, with the censoring count reported (censoring
 biases the reported mean low; we flag every table entry with censoring > 1%).
 
-In total the Z/p run matrix comprises **70 measured configurations** — 16 at n = 41, 28 at n = 32,
-26 at n = 48 (Appendix A lists every run).
-
 Seeds: a fixed seed per program run (0xABCDEF0123456789) with fresh jump tables per run; trial
 level randomness streams from a counter-based RNG. The jump table is a single fixed draw per run —
 the K fluctuation attributable to the table draw is estimated in §4.4.
@@ -533,7 +569,7 @@ the K fluctuation attributable to the table draw is estimated in §4.4.
 
 1. **The oracle is a hash, not EC arithmetic.** On the curve, the jump index is x mod 2^m of the
    *field element* x; consecutive walk positions' low bits are then related by the group law
-   (x' = λ_J² − x − x_J), not by a random function. Our model replaces this by a random oracle keyed
+   (x' = λ² − x − x_J), not by a random function. Our model replaces this by a random oracle keyed
    on the canonical exponent. The measured quantities that could detect the difference —
    single-walk displacement statistics (§4.2.1), sign-flip rate, DP-rate uniformity, and end-to-end
    K at matched configuration — agree to 0.3–17%; the single-walk band width is the weakest
@@ -541,8 +577,15 @@ the K fluctuation attributable to the table draw is estimated in §4.4.
 2. **One jump table per run.** Jump magnitudes u_i are a fixed random draw; the Herfindahl model
    assumes u ⊥ tag in expectation. Within a tag-0 subclass of M/4 indices the realized mean of u²
    fluctuates by ~σ(u²)/(E[u²]·√(M/4)) ≈ 1.6% at M = 2^14; this propagates a ~0.8% seed-to-seed
-   uncertainty into Law 3.2's predictions, of the same order as the observed residuals. The
-   M = 2^9 runs (§5.4) show what a *pathologically* correlated table draw does at scale.
+   uncertainty into Law 3.2's predictions — an *analytic* estimate that the replication of
+   Appendix A shows to be optimistic: the measured between-seed component is τ = 0.005–0.012
+   across the §3.4 arms (0.4–1.2% relative), and for the v0 independent-tag arm the archived
+   default-seed run sits ≈ 2% below the fresh-seed chunks. Between-seed variance is therefore of
+   the same order as several effects the paper claims (the Law 3.2 residuals, the +0.2% shared-tag
+   formula match); we quote random-effects CIs where it matters (§3.4) and flag single-seed
+   claims elsewhere. The M = 2^9 degradation (§5.4) is loop handling at small M, not table-draw
+   pathology: the L1S2 bounce rate scales as ≈ 1/(2M) and naive handling turns a 512-entry
+   table's bounce rate into 103.5 restarts/kangaroo.
 3. **Op accounting follows Kang-1.** Restarts are free; the SOTA+ second point is free unless `-w`
    is set. Both choices are RC's; §7.2 re-prices them. In particular our "K = 1.1537" for SOTA
    includes DP overhead at dp 5 (≈ 0.7%), and our "ideal-equivalent" columns are model estimates,
@@ -609,8 +652,7 @@ RC's RCKangaroo estimates the achievable K at load DPK = 1.15·√W/(h·2^d) as
   K = 1.15 + (0.07 + 0.76/√DPK) / (1 + 0.30·DPK).   (RC formula)
 
 Our dp and herd sweeps give an independent test over DPK ∈ [0.002, 74] — more than four orders of
-magnitude, including configurations outside the formula's designed domain (the ≤ 2.5% region is
-scoped in the summary below). Residual = (measured − formula)/formula.
+magnitude. Residual = (measured − formula)/formula.
 
 | config (all SOTA, h = 512 unless noted) | DPK | formula | measured | residual | notes |
 |---|---|---|---|---|---|
@@ -631,7 +673,7 @@ scoped in the summary below). Residual = (measured − formula)/formula.
 | n=48, h = 8192, dp 11 | 0.813 | 1.8838 | 1.9150 ± 0.0830 | +1.7% | |
 | n=48, h = 8192, dp 12 (esc) | 0.407 | 2.2747 | 2.3105 ± 0.1069 | +1.6% | |
 | n=48, h = 32768, dp 16 (esc) | 0.006 | 10.7369 | 8.4238 ± 0.3572 | **−21.5%** | formula over-penalizes |
-| n=48, h = 512, dp 5 (=Kang-1) | 73.60 | 1.1569 | 1.1537 ± 0.0195 | −0.3% | the calibration point |
+| n=41, h = 512, dp 5 (=Kang-1) | 73.60 | 1.1569 | 1.1537 ± 0.0195 | −0.3% | the calibration point |
 | n=32, h = 512, dp 5 | 3.253 | 1.3987 | 1.4012 ± 0.0091 | +0.2% | |
 | n=32, h = 64, dp 5 | 26.02 | 1.1749 | 1.3379 ± 0.0155 | **+13.9%** | herd geometry |
 | n=32, h = 128, dp 5 | 13.01 | 1.2072 | 1.2930 ± 0.0133 | +7.1% | herd geometry |
@@ -639,7 +681,7 @@ scoped in the summary below). Residual = (measured − formula)/formula.
 | n=32, h = 8192, dp 5 | 0.203 | 2.8047 | 2.5621 ± 0.0148 | −8.6% | |
 
 **Summary.** The formula is accurate to ≤ 2.5% across its designed domain: at the calibration herd
-(h = 512) for r ∈ {31, 40} over DPK ∈ [0.025, 74], and at r = 47 for h ∈ {2048, 8192}. It fails in three
+(h = 512) for r ∈ {31, 40} over DPK ∈ [0.025, 74], and at r = 47 for h ≥ 2048. It fails in three
 regimes, all *outside* the domain it was fitted on: (i) small herds at wide intervals (+7–14%,
 geometric, §5.5); (ii) extreme low DPK at wide intervals with naive loop handling (dp ≥ 18 at
 n = 48: +15% to +79%, loop/DP pathology, §5.4); (iii) very large herds at very low DPK (−21.5% at
@@ -649,10 +691,69 @@ two-parameter fit around (r, h) = (40, 512).
 
 ### 5.4 Fragility I: loop handling
 
-At n = 48 (r = 47), h = 512, M = 2^14, the walk band (≈ 2^32.2) is ~90× narrower than the wild
-start spacing (≈ 2^38.7, from the §5.5 spacing formula); each kangaroo walks 10^4–10^5 steps inside a saturated band, and loops
-dominate behavior. A kangaroo that has saturated its band is not exploring; it is pacing its cage —
-and the published constant 1.15 quietly becomes 1.95 unless the cage is handled. Measured at dp 14
+At n = 48 (r = 47), h = 512, M = 2^14, the cycle-entry band (≈ 2114√W = 2^34.6, §3.2) is ≈ 18×
+narrower than the wild start spacing (2^38.67); by solve time each kangaroo has walked ≈ 3–5·10^4
+steps (K·√W/h at the measured K) — past the median cycle-entry point (μ median ≈ 2.1·10^4, §3.2).
+What matters is the cycle-*entry rate*, and it is a property of the walk, not the herd:
+instrumented runs (`kangsim_diag.c -cyclog`, 60 trials each) measure 1.41 detected cycle events
+per kangaroo at h = 512 (4.8·10^4 steps/kang) and 0.41 at h = 2048 (1.2·10^4 steps/kang) — the
+same ≈ 1 event per 3·10^4 steps (the L1S2 rate 1/32 768, §3.2) — while at any given solve instant
+only ≈ 0.007% of kangaroos sit in a detectable (λ ≤ 16) cycle: the events are transient (the
+handler restarts within 16 steps of entry). **But `-cyclog` counts only λ ≤ 16 cycles** — the
+ones the 16-deep history already catches. The *long* cycles (λ up to 10^4, §3.2) need their own
+instrument, and a second diagnostic pass (`-cyclog2`: Brent detection per kangaroo *life*, i.e.
+per stretch between handler restarts, plus per-kangaroo occupancy logging) measures them at the
+same configuration:
+
+| handling | long-cycle effect at r = 47, M = 2^14 |
+|---|---|
+| simple, h = 512 | 5.9% of kangaroo-slots enter an undetected long cycle (1 821 first-fires of 30 720 = 60 trials × 512; 1 800, also 5.9%, are still caged when the herd solves — the DP timeout never fires at dp 14, the per-slot budget ≈ 4.7·10^4 steps sitting far below the 20·2^14 timeout); ≈ 3.1% of all steps are spent inside one; occupancy rises with life-step (1.4% at 16 000, 3.7% at 26 000, 5.2% at 32 000, 24% at 64 000) |
+| escape, h = 512 | 4.5% of kangaroo-slots (4 563 of 102 400, 200 trials; all still caged at trial end — the escape rule suppresses the short-cycle bounces, 224 against 43 439 in the simple run), wasting ≈ 2.3% of all steps; occupancy 2.1% at life-step 26 000, 6.3% at 64 000 |
+| escape, h = 2048 | essentially none trapped (measured: 1 008 of 122 880 slots = 0.8%; 0.4% of steps) |
+| simple, h = 512, dp 20 | 35.8% of kangaroo-slots enter an undetected long cycle (11 006 of 30 720; 35.6% still caged at trial end); **24.4% of all steps** are spent inside one; among kangaroos still alive at life-step 128 000, 75% are caged (≈ 100% by 256 000) — the herd stalls |
+| simple, h = 512, dp 24 | 89.5% of kangaroo-slots enter an undetected long cycle (9 166 of 10 240 = 20 trials × 512; 89.0% still caged at trial end); **87.9% of all steps** are spent inside one; every kangaroo still alive past life-step ≈ 256 000 is caged (occupancy 1.000 at 512 000–4 000 000) — the herd is fully stalled |
+
+**Counting note.** A *kangaroo-slot* is one trial's worth of one kangaroo (trials × h); a
+*life* is the stretch between two handler events (birth, short-detect bounce). The
+`-cyclog2` instrument classifies every handler-ended life (in these runs, all life-ends
+are short-detect bounces — timeout-in-long-cycle and timeout-free are exactly 0
+everywhere, because the per-slot step budget sits below the 20·2^d DP timeout at every
+dp measured) and, separately, censuses at each trial's end every kangaroo still inside an
+undetected long cycle (*caged at solve*; those lives are ended by the herd's solve, not by
+the handler, and are the counts in the "still caged" figures above). The entry share is
+first-fires per slot; an earlier draft divided the caged census by handler-ended lives
+instead (4.0%/6.2%/6.9% at dp 14/20/24) — a mixed denominator, withdrawn here. The
+more comparable quantity is the entry rate per *uncaged* step: ≈ 1.3·10^-6 (dp 14),
+2.0·10^-6 (dp 20), 2.2·10^-6 (dp 24). It is not constant — the gap between dp 14 and
+dp 20–24 rests on thousands of events — and the occupancy-by-life-step data show why: the
+entry hazard rises with a life's age, and at dp 14 lives are short because frequent
+short-cycle bounces keep restarting them. The growing per-slot entry shares
+(5.9% → 35.8% → 89.5%) therefore reflect mainly the growing per-slot uncaged step budget
+(4.7·10^4 → 1.8·10^5 → 4.1·10^5) and the older lives it allows, not a different walk.
+
+Two consequences. First, the +10% escape-rule residual at dp ≤ 14 (1.7601 vs formula 1.5976) is
+*not* churn — the escape rule records 0.002 restarts/kangaroo, which cannot buy 10% — it is the
+herd-geometry load of §5.5 (spacing/band ≈ 18 at h = 512), the same +10–13% seen across all
+methods there; and total churn is similar at h = 512 (1.41 × 512 ≈ 722 events) and h = 2048
+(0.41 × 2048 ≈ 840) while only h = 512 degrades, so churn explains neither row. Second, the
+long-cycle numbers dominate only at *low DP density*: at dp ≤ 14 they are a few-percent
+contributor (the earlier draft's suggestion that cycling plus the timeout explains the n = 48
+fragility at dp ≤ 14 is withdrawn — the geometry is the explanation there). Where the timeout
+*does* dominate is dp ≥ 20: the DP timeout is 20·2^d steps — 2.1·10^7 at dp 20 and 3.4·10^8 at
+dp 24 — while each kangaroo's whole budget is far smaller (4.7·10^4–4.1·10^5 uncaged steps per
+slot across dp 14–24). The long-cycle entry rate per uncaged step is 1.3, 2.0 and 2.2·10^-6
+at dp 14, 20 and 24 — an age-dependent hazard (it rises with a life's age, and dp 14 lives are
+kept short by frequent bounces) — so the fraction of kangaroo-slots that eventually enter
+grows mainly with the budget: 5.9% at dp 14, 35.8% at dp 20, 89.5% at dp 24 — and at
+dp ≥ 20 the timeout exceeds the kangaroo's whole budget, so a kangaroo that lands is lost for
+the rest of the run. The dp 20 occupancy measurement makes the stall direct: 24.4% of all steps
+are wasted inside undetected cycles, and the caged fraction of still-alive kangaroos climbs from
+23% at life-step 64 000 to 75% at 128 000 and ≈ 100% by 256 000 — the herd stops working early,
+which is exactly the observed shape of the dp 24 run (48/60 trials censored at the cap, the 12
+that solved finishing early). The dp 24 explanation is therefore long-cycle occupancy, not the "geometric luck"
+framing of §5.5 (revised there; occupancy logged per-kangaroo over time in the `-cyclog2` output
+files, Appendix A). A kangaroo past cycle entry is not exploring; it is pacing its cage — and the published
+constant 1.15 quietly becomes 1.95 unless the cage is handled. Measured at dp 14
 (300 trials, simple handling; 200 trials, escape handling):
 
 | loop handling | K | restarts/kang | formula | ideal |
@@ -670,7 +771,10 @@ fine (dp 12: +0.1%); at *low* DP density the detector must do the work and the r
 
 Two further fragility datapoints at n = 48: the *jump-table size* M = 2^9 gives K = 4.6974 ± 0.3035
 (+194% over formula; 103.5 restarts/kang — the L1S2 loop rate scales as ~1/M and the band is
-narrow), while M = 2^11 at n = 32 is harmless (1.4179 ± 0.0118, +1.4%); and the legacy *mirror*
+narrow; a property of *naive* handling at small M, not of RC's configuration — RC's production GPU
+code ships M = 2^9 (`JMP_CNT = 512`) but pairs it with the displacement-history detector and the
+two-table chain-preserving escape, precisely the handling whose absence is being measured here),
+while M = 2^11 at n = 32 is harmless (1.4179 ± 0.0118, +1.4%); and the legacy *mirror*
 method, whose walks loop "continuously" in RC's words, shows the worst degradation of any method
 (2.2834 vs formula 1.5976, +42.9%, restarts/kang 1.56).
 
@@ -687,20 +791,22 @@ Measured at n = 32, dp 5 (formula value from DPK):
 
 | h | DPK | formula | measured | residual | wild start spacing | spacing/band |
 |---|---|---|---|---|---|---|
-| 64 | 26.02 | 1.1749 | 1.3379 ± 0.0155 | +13.9% | 2^25.7 | ≈ 2.4 |
-| 128 | 13.01 | 1.2072 | 1.2930 ± 0.0133 | +7.1% | 2^24.7 | ≈ 1.2 |
-| 512 | 3.253 | 1.3987 | 1.4012 ± 0.0091 | +0.2% | 2^22.7 | ≈ 0.3 |
-| 2048 | 0.813 | 1.8838 | 1.8165 ± 0.0136 | −3.6% | 2^20.7 | ≈ 0.07 |
-| 8192 | 0.203 | 2.8047 | 2.5621 ± 0.0148 | −8.6% | 2^18.6 | ≈ 0.02 |
+| 64 | 26.02 | 1.1749 | 1.3379 ± 0.0155 | +13.9% | 2^25.7 | ≈ 1.3 |
+| 128 | 13.01 | 1.2072 | 1.2930 ± 0.0133 | +7.1% | 2^24.7 | ≈ 0.65 |
+| 512 | 3.253 | 1.3987 | 1.4012 ± 0.0091 | +0.2% | 2^22.7 | ≈ 0.16 |
+| 2048 | 0.813 | 1.8838 | 1.8165 ± 0.0136 | −3.6% | 2^20.7 | ≈ 0.04 |
+| 8192 | 0.203 | 2.8047 | 2.5621 ± 0.0148 | −8.6% | 2^18.6 | ≈ 0.01 |
 
-(band B ≈ 2^24.4 at r = 31, M = 2^14, from §3.2; wild spacing = 1.0625·W/(2h/3)). Within this
+(band = the cycle-entry band at r = 31, M = 2^14: 897√W ≈ 2^25.3, §3.2; wild spacing =
+1.0625·W/(2h/3)). Within this
 sweep the residual is monotone in the spacing/band ratio: the formula over-penalizes DP overhead
 when the herd over-tiles the interval (each kangaroo's short walk still lands in someone's band),
 and under-penalizes the *geometry* when the herd under-tiles it (gaps between wild bands must be
 bridged by the walk's own excursion, which is bounded by the band). The same monotone trend
-appears within the n = 48 sweep (§5.3): h = 512 has spacing/band ≈ 92 (spacing ≈ 2^38.7 vs band
-2^32.2) and shows +10–13% at dp ≤ 14, h = 2048 (≈ 23) shows +0.4%, h = 8192 (≈ 6) shows +1.6% —
-and h = 32768 (≈ 1.5, over-tiled at this dp) flips the sign: −21.5%. Across ranges the ratio is
+appears within the n = 48 sweep (§5.3): h = 512 has spacing/band ≈ 18 (spacing 2^38.67 vs cycle-entry
+band 2114√W ≈ 2^34.6, §3.2) and shows +10–13% at dp ≤ 14, h = 2048 (≈ 2.7) shows +0.4%,
+h = 8192 (≈ 0.7) shows +1.6% — and h = 32768 (≈ 0.2, over-tiled at this dp) flips the sign:
+−21.5%. Across ranges the ratio is
 not the only variable (the n = 48 dp-16 point nets −0.4% because the formula's overhead term is
 slightly conservative at that geometry); the safe statement is monotonicity *within* a range, plus
 the failure mode below.
@@ -709,9 +815,15 @@ the failure mode below.
 trials hit the 200√W cap without a single useful collision (the 12 that solved took
 K = 19.41 ± 4.50). The mechanism is arithmetic: in the 12 trials that solved, the herd had stored
 only ≈ 14 DPs when the collision landed, and even a full 200√W budget stores only ≈ 140 DPs — far
-below any birthday requirement — so in this configuration collisions are geometric-luck events,
-not birthday events: the herd neither tiles the interval (spacing/band ≈ 92) nor generates enough
-DPs per unit time to compensate, and 48 of 60 trials run out of luck.
+below any birthday requirement — so in this configuration collisions are not birthday events: the
+herd neither tiles the interval (spacing/band ≈ 18) nor generates enough
+DPs per unit time to compensate. The dominant mechanism for the 48 failures, however, is now
+measurable and is not luck: at dp 24 the DP timeout (3.4·10^8 steps) exceeds each kangaroo's
+whole budget, so under simple handling every kangaroo that enters an undetected long cycle is
+permanently lost (§5.4's occupancy measurement: at dp 24, 87.9% of all steps are spent inside
+undetected cycles and every kangaroo alive past life-step ≈ 256 000 is caged — the herd stops
+generating DPs almost entirely after the first few lives; the 12 solving trials are the ones
+whose early lives got lucky before the stall).
 Practical reading: *h and d must be chosen together with r*; RC's formula embeds this only through
 DPK, which is blind to the spacing/band ratio that actually governs the failure.
 
@@ -727,25 +839,48 @@ is that the EC instrument confirms the model's constants to a few percent.
 
 ### 5.7 Robustness to jump-scale, table size, and the ideal 1v1 model
 
-* **Jump scale.** minjump = 2^(⌊r/2⌋+js) for js ∈ {2,3,4,5} (mean jump 1.5·minjump ≈ 4.2–34√W
-  at r = 31, per the §2.3 floor convention): at n = 32,
+* **Jump scale.** minjump = 2^(r/2+js) for js ∈ {2,3,4,5} (mean jump 4√W–32√W): at n = 32,
   K = 1.4164 / 1.4012 / 1.4152 for js = 2/3/4 — insensitive to the jump scale over a 4× range,
   the constant being carried by the geometry and the selection structure rather than the jump
   magnitude. At n = 48 the scale matters only through loop exposure: with escape handling js 3/4
   give 1.7601 / 1.7298 (−1.7%), and with simple handling js 3/4/5 give 1.9502 / 1.8035 / 1.7832 —
-  larger jumps mean fewer band revisits per unit distance and hence less restart damage, an
-  effect that vanishes once loops are handled properly.
+  under naive handling larger jumps mean fewer band revisits per unit distance and hence less
+  restart damage (−8.6% from js 3 to js 5), an effect that largely vanishes once loops are
+  handled properly (−1.7% from js 3 to js 4 under the escape rule).
 * **Jump-table size.** M = 2^9/2^11/2^14 at n = 32: 1.4272 / 1.4179 / 1.4012 (M = 2^9 costs +2%);
-  at n = 48, M = 2^9 is a catastrophe (4.6974, +194%; §5.4) — the table must scale with the walk
-  length.
-* **1v1 ideal model (no DP, no herd).** The textbook 1-tame-1-walk every-point-check model gives,
-  at n = 32 (20 000 trials): mean jump 0.5√W: K = 1.8916 ± 0.0138; 1√W: 2.4854 ± 0.0199; 2√W:
-  4.2262 ± 0.0456; 3√W: 3.5121 ± 0.0277; 4√W: 11.1402 ± 0.1207 (this run's cost distribution is
-  extremely heavy-tailed; see reading (ii) below). At n = 41: 0.5√W: 2.3194 ± 0.0617; 1√W: 4.0766 ± 0.2047 (800 trials);
-  3√W: 3.3738 ± 0.0776. Two readings: (i) the every-point model has no DP overhead, yet its
-  constant is *worse* than the DP-based herd methods (2.3–4 vs 1.15–2.4) — the herd + DP structure
-  is not an overhead, it is the algorithm; (ii) the per-trial cost distribution is heavy-tailed
-  (median ≪ mean at jm ≥ 1), a warning against small-sample K estimates in this problem class.
+  at n = 48, M = 2^9 is a catastrophe (4.6974, +194%; §5.4) — under *naive* handling, whose cost
+  scales with the L1S2 bounce rate ≈ 1/(2M); RC's production code ships M = 2^9 precisely
+  because it pairs the small table with the chain-preserving escape (§5.4).
+* **1v1 ideal model (no DP, no herd) — and a retraction.** The textbook 1-tame-1-wild
+  every-point-check model was measured in the first draft at n = 32 (20 000 trials, one jump
+  table per mean jump): 0.5√W: K = 1.8916 ± 0.0138; 1√W: 2.4854 ± 0.0199; 2√W: 4.2262 ± 0.0456;
+  3√W: 3.5121 ± 0.0277; 4√W: 11.1402 ± 0.1207 (bimodal — see below). The first draft
+  read the non-monotonicity (3√W cheaper than 2√W) and the jm = 4 outlier as structure. That
+  reading does not survive a table-draw control: with the trial stream frozen and only the jump
+  table re-drawn (`kangsim_diag.c -ts`, 4 draws × 3 000 trials per mean jump), the 1v1 constant
+  swings wildly — 0.5√W: 2.18–2.80; 1√W: 1.77–3.44; 2√W: 2.56–11.08; 3√W: 4.10–15.43;
+  4√W: 3.50–14.11. The within-run ±CI (±0.04–0.43) understates the true uncertainty by an order
+  of magnitude: at fixed mean jump the four table draws differ by up to 4.3×, and the first
+  draft's shape conclusions (the non-monotonicity, the jm = 4 anomaly) are table-draw noise; the
+  same caveat applies to the n = 41 1v1 rows. The jm = 4 row shows the mechanism behind that
+  noise directly. With one jump table per run, every trial walks the same deterministic
+  coalescence tree of trails; at jm = 4 two trails need ≈ m² ≈ 16W of travel to merge by chance —
+  far more than the start spread W — and in this table draw the tree has one dominant merge point
+  ≈ 40W beyond the interval. A tame/wild pair whose trails start in different main branches
+  (about half of all pairs) can only meet there: 10 006 of the 20 000 trials end in a narrow band
+  K = 19.38–19.87, every one at the same absolute group element, while the rest end far earlier
+  (deciles from 0.6). The median sits on the boundary between the two modes and is unstable —
+  19.38 over all 20 000 trials, 6.43 over the first 2 000 (48% in the band) — so the first
+  draft's "median 19.38" is a correct value of an uninformative statistic. An earlier revision
+  explained it as censoring at the op cap; that was wrong — no trial reaches the cap. What survives is weaker than the first draft claimed but
+  still real: compared *like with like*, the best 1v1 draws at 0.5–1√W (1.77–2.18) *beat* the
+  classic DP herd at the same width (2.38 at n = 32) — as an every-point check with no DP
+  overhead should. The 1v1 model loses to SOTA/SOTA+ (1.40/1.15) not because "herd + DP is the
+  algorithm" but for three specific reasons the paper measures elsewhere: the 1v1 model lacks
+  the adaptive-sign walk's negation symmetry, the wild–wild collision channel (§6.3: ≈ one
+  third of SOTA solves), and the herd geometry that pre-positions walks across the interval.
+  The heavy-tail warning also survives (median ≪ mean in most uncensored draws). We keep the
+  archived single-draw numbers above as an example of the trap, not as constants.
 
 ---
 
@@ -761,16 +896,16 @@ a candidate "free second sample per operation".
 
 **Measured (h = 512, dp 5, M = 2^14).**
 
-| config | K (second sample free) | K_weighted at 0.3 op/step | baseline | gain (free) |
+| config | K (second sample free) | K_weighted (priced) | baseline | gain (free) |
 |---|---|---|---|---|
 | SOTA + mirror, n=32 (20 000 tr.) | 1.3644 ± 0.0089 | — | 1.4012 ± 0.0091 | **2.6% ± 1.3% (2.9σ)** |
-| SOTA + mirror, n=41 (4 000 tr.) | 1.1262 ± 0.0186 | 1.4586 (priced run) | 1.1537 ± 0.0195 | 2.4% ± 2.4% (1.0σ) |
+| SOTA + mirror, n=41 (4 000 tr.) | 1.1262 ± 0.0186 | 1.4641 (0.3 op/step) | 1.1537 ± 0.0195 | 2.4% ± 2.4% (1.0σ) |
 | SOTA+ v2 + mirror, n=32 (20 000 tr.) | 1.1109 ± 0.0076 | — | 1.1522 ± 0.0079 | 3.6% ± 1.3% (3.8σ) |
-| SOTA+ v2 + mirror, n=41 (4 000 tr.) | 0.9724 ± 0.0165 | 1.2641 (priced run) | 1.0093 ± 0.0170 | 3.7% ± 2.3% (1.6σ) |
-| SOTA + mirror, n=48 dp14 (150 tr.) | 1.7977 ± 0.1402 | — | 1.7601 ± 0.1045 (esc) | −2.1% ± 10% (n.s.) |
+| SOTA+ v2 + mirror, n=41 (4 000 tr.) | 0.9724 ± 0.0165 | 1.2641 (0.15 op/step) | 1.0093 ± 0.0170 | 3.7% ± 2.3% (1.6σ) |
+| SOTA + mirror, n=48 dp14 (150 tr., simple handling) | 1.7977 ± 0.1402 | — | 1.9502 ± 0.1025 (simple) | +7.8% ± 9% (n.s.) |
 
 **Findings.** (i) The statistically significant gains are ≤ 3.6% at *zero* priced cost — far below
-the √2 ≈ 41% a second independent walk would deliver. (ii) The reason is visible in the match
+the ≈ 29% (= 1 − 1/√2) a second independent walk would deliver. (ii) The reason is visible in the match
 statistics: the mirror channel's matches are almost entirely *spurious* — at n = 41 the
 "other"-category matches (algebraically solvable candidates that do not equal the target) number
 57–80 out of ≈830k matches in the two mirror add-on runs, and in the pure mirror method 304k out
@@ -783,9 +918,17 @@ DB pollution, not as information. (iii) What the mirror actually buys is DP dens
 trail doubles the per-step DP checks (measured dp rate 1/16 = 2/32 exactly; 11/128 for the SOTA+
 combination, again exact), i.e. it trades DB size for a few percent of K. (iv) Priced at even
 0.3 op/step — far cheaper than any real implementation of a second point — every mirror variant
-loses to its baseline outright (1.4586 vs 1.1537; 1.2641 vs 1.0093). Break-even is
+loses to its own baseline outright (1.4641 vs its SOTA baseline 1.1537 at 0.3 op/step;
+1.2641 vs its SOTA+ v2 baseline priced the same way, 1.0093 × 1.15 ≈ 1.16, at 0.15 op/step —
+both sides paying for v2's second point). Break-even is
 W_ALT ≈ 24/1000 op/step for SOTA+mirror at n=41: **money-losing at any physically realizable
-price**. (v) A subtle implementation coupling: mirror inserts reset the loop detector of the
+price**. One reading note: K_weighted is an accounting identity, not an independent
+measurement — the alternate point advances deterministically on every step in these
+configurations, so K_weighted = K_main × (1 + c·w), with c the number of alt-point advances
+per step (c = 1 for the priced SOTA and SOTA+ rows, c = 2 when the mirror's own advance is
+priced on top of the v2 second point). The printed values are therefore exact by
+construction (1.4641 = 1.1262 × 1.3; 1.2641 = 0.9724 × 1.3 at w = 0.15), and the priced
+rows carry no sampling information beyond K_main. (v) A subtle implementation coupling: mirror inserts reset the loop detector of the
 inserting kangaroo, which alone improves K_main by ~2% at n = 41 (restarts/kang 0.078 vs 0.085);
 implementers evaluating "mirror-like" tricks should control for this side effect. The mirror, in
 short, is an excellent way to double your database and a poor way to halve your work.
@@ -794,9 +937,12 @@ short, is an excellent way to double your database and a poor way to halve your 
 
 secp256k1 has an efficient endomorphism: the map ψ(x, y) = (β·x mod p, y), with β a cube root of
 unity mod p, satisfies ψ(P) = [λ]P for a cube root of unity λ mod n (λ³ ≡ 1 mod n, λ ≢ 1).
-Equivalence-class methods (Galbraith–Ruprai [G-R 2010]) accelerate interval DLP by walking on the
-orbits {±P, ±ψP, ±ψ²P} of size 6 — the walk only needs to hit a class-mate of the target — which
-is the mechanism behind their ≈ 1.36√N constant in groups with fast inversion.
+Equivalence-class methods (Galbraith–Ruprai [G-R 2010]) accelerate interval DLP by walking on
+orbits under point negation — the walk only needs to hit a class-mate of the target, and with
+fast inversion the negation class is free — which is the mechanism behind their ≈ 1.36√N
+constant: that result is the *negation-class* (fast-inversion) case. (Class structure differs
+between curves; what matters
+for what follows is only that a class method requires contained exponents.)
 
 The obstruction for a *1-dimensional* walk on secp256k1: a kangaroo walk stores displacements
 c and recovers k from a collision by integer arithmetic in the exponent domain. For the class
@@ -811,41 +957,65 @@ the class speedup is unrealizable in a 1-D walk — one needs a genuinely higher
 (lattice-shaped, as in G-R's construction), whose geometry reintroduces boundary losses (G-R's own
 caveat: walks leave the search space; fruitless cycles must be filtered).
 
-This analysis bears on a recent **unpublished preprint** (referred to here as the "Churchwell
-preprint"; see §8.3) claiming a 1-D walk construction with constant √(π/2) ≈ 1.2533 by merging
-endomorphism-accelerated channels into a single walk. We were unable to verify the claim: the
-preprint's reference implementation does not build or run as released, and its merge step — the
-point where multiple class channels are folded into one displacement ledger — does not conserve
-the exponent algebra (a collision merged across channels is attributed to a target offset that the
-channel data do not determine). We report this as our assessment of a non-verifiable artifact, not
-as a refereed finding; if a buildable construction appears, §6.2's obstruction says what it must
-overcome.
+This analysis bears on a recent **unpublished, community-circulated preprint** (referred to here
+as the "Churchwell preprint"; see §8.3) presenting a construction that merges
+endomorphism-accelerated channels into a single walk and reads the resulting constant
+√(π/2) ≈ 1.2533 as a *floor* for 1-D walks — i.e. that no 1-D construction can attain a
+constant below it. These are two different kinds of claim: the merge step, even if correct,
+establishes *attainability*; a floor would additionally require a matching lower bound. We
+engage with the construction as such (§8.3). We were unable to
+verify the claim: no buildable reference implementation was available to us at the time of
+writing, and our reading of the merge step — the point where multiple class channels are folded
+into one displacement ledger — is that it does not conserve the exponent algebra (a collision
+merged across channels appears to be attributed to a target offset that the channel data do not
+determine). We report this as our assessment of an artifact we could not verify, not as a
+refereed finding, and we hold it provisionally; if a buildable construction appears, §6.2's
+obstruction says what it must overcome.
 
 ### 6.3 The √(π/2) ≈ 1.2533 "floor" and why SOTA+ sitting below it is not a contradiction
 
-The number 1.2533 is recognizable: √(π/2) = 1.25331…, the mean of the Kolmogorov distribution
-E[sup_t |B_t|] for standard Brownian motion on [0,1] — the constant that surfaces when a
-diffusion-style meeting-time argument for walk-based birthday structures is made precise. It
-circulates in the community literature (and in the unpublished preprint of §6.2/§8.3) as a floor
-for 1-D kangaroo walks.
+The number 1.2533 is recognizable: √(π/2) = 1.25331… is the classical birthday-process constant —
+but for the *single-pool* process: it is the expected first-repeat time *within one walk* (the
+Pollard ρ constant — how long a single self-colliding walk runs before revisiting a state, in
+√N units), **not** the meeting time of two independent walks. Two equal pools that must find
+each other carry a √π factor instead; the tame–wild kangaroo is the two-pool case, which is why
+the classical kangaroo constants sit near 2, not 1.25. It circulates in the community literature
+(and in the unpublished preprint of
+§6.2/§8.3) as a floor for 1-D kangaroo walks. (An earlier draft of this section attributed the
+constant to the mean of the Kolmogorov distribution; that law is the supremum of the Brownian
+*bridge*, whose mean is √(π/2)·ln 2 ≈ 0.869 — a numerically adjacent constant from a different
+computation. The attribution is corrected here.)
 
 Taken literally as a floor over all 1-D walks, the figure is already falsified by measurement:
-plain SOTA — one new class-sample per operation — measures K = 1.15 at the Kang-1 configuration
-and 1.15 ideal across our whole range sweep. The figure can therefore only be a statement about a
+plain SOTA — a single sample per operation, no second point — measures K = 1.15 at the Kang-1
+configuration
+and 1.15 ideal across our whole range sweep. Why it sits below the tame–wild constant is
+structural, and §3.1's collision algebra already contains the reason: the SOTA herd's *wild*
+kangaroos can collide with each other through the negation channel, and a wild–wild meeting
+solves too (k′ = (c₁+c₂)/2). Part of the herd therefore behaves as a single self-colliding pool
+rather than as one of two pools that must find each other — and a single pool has the smaller
+birthday constant (√(π/2) vs √π at equal sizes). Instrumented runs of our simulator (the
+solve-channel counters of `kangsim_diag.c`, which classify the *solving* collision by the pair
+of roles that fired; Appendix A) put the wild–wild
+share at 499/1 500 solves at n = 32 and 94/300 at n = 41 — about one third. The figure can therefore only be a statement about a
 restricted family (most plausibly: walks with the *standard* full-interval herd geometry and a
 diffusive sign process, i.e. the classic lineage where 2.0 → 1.715 → 1.661 live — our measured
 constants for that lineage, 2.11/1.61/1.35 at the Kang-1 configuration, all sit above 1.2533).
 Since the preprint is unverifiable (§8.3) we cannot check its hypotheses; we flag the tension
 rather than paper over it.
 
-For SOTA+ the arithmetic works out cleanly, which is presumably why the two-sample reading
-circulates: each SOTA+ operation offers *two* class-samples (the main candidate and the
-alternative candidate share one inversion), and any per-operation birthday floor scales as
-1/√(samples per operation): 1.2533/√2 ≈ **0.886**. Our SOTA+ v2 ideal-equivalent (1.004–1.009)
-sits between the two-sample floor 0.886 and the single-sample floor 1.2533 — below the latter,
-comfortably above the former. So: no contradiction with the two-sample reading; a measured
-contradiction with the unrestricted single-sample reading; and an obstruction (§6.2) saying that
-any construction which approaches these floors must leave the 1-D endomorphism-class template.
+For SOTA+ the arithmetic works out cleanly, but the mechanism reading needs care. The two-sample
+bound is genuine arithmetic: each SOTA+ operation offers *two* class-samples (the main candidate
+and the alternative candidate share one inversion), so any per-operation birthday-floor argument
+scales as 1/√(samples per operation): 1.2533/√2 ≈ **0.886**. Our SOTA+ v2 ideal-equivalent
+(1.004–1.009) sits between 0.886 and 1.2533. But the two-sample reading was never the right
+explanation of the measured constants: plain SOTA has no second sample and still measures 1.15
+(because of the wild–wild one-pool share above), and §3.4 shows SOTA+'s incremental gain over
+SOTA is *concentration*, not a second independent sample. So: the unrestricted single-sample
+floor 1.2533 is measured-false for the SOTA family for a structural reason (one-pool share);
+the two-sample bound 0.886 survives as arithmetic but does not describe how the family gets
+where it is; and an obstruction (§6.2) says that any construction which approaches these
+constants must leave the 1-D endomorphism-class template.
 
 ---
 
@@ -859,8 +1029,8 @@ and a chain-preserving loop handler. Remove any one and the constant degrades me
 naive loop handling → 1.95 at r = 47 (§5.4); wrong herd scale → +7–14% (§5.5); directed walk
 (classic) → 2.1–2.4; three-herd without the symmetry algebra (3-way) → 1.6–1.9. The constant is
 *not* a property of the walk alone, and we found no evidence it can be improved by jump-table
-tuning (§5.7: ±1.5% over a 4× jump-scale range) — the remaining gap to the two-sample floor
-(0.886) is, on our evidence, structural rather than tunable.
+tuning (§5.7: ±1.5% over a 4× jump-scale range) — the remaining gap to the two-sample arithmetic
+bound (0.886) is, on our evidence, structural rather than tunable.
 
 ### 7.2 The honest accounting of SOTA+
 
@@ -877,7 +1047,7 @@ SOTA+ beats plain SOTA only if the second point costs less than:
 
 * *Unbatched inversion* (a straightforward CPU implementation: one modular inversion per
   addition — tens to hundreds of mul-equivalents, depending on the inversion algorithm): the
-  alternative shares the inversion; its marginal cost is one λ_J-multiplication plus one squaring,
+  alternative shares the inversion; its marginal cost is one λ-multiplication plus one squaring,
   ≈ 0.01–0.05 op. **SOTA+ is profitable here** — consistent
   with RC's framing ("if inversion calculation takes a lot of time, this second point is cheap for
   us") and with Kang-1 being a CPU demonstrator.
@@ -907,31 +1077,37 @@ sharpens the adversarial caveat of §4.4.6.
    dp 20) and can silently *fail* at extreme dp (§5.5 failure mode).
 2. **Herd size and DP bits must co-scale with the range.** The spacing/band ratio is the governing
    geometric quantity; a practical rule of thumb from our data is wild spacing ≲ band width
-   (spacing/band ≲ 1), i.e. h ≳ 3·1.0625·W/(2·B) with B ≈ 400·√W·(M/2^14)^0.4 — and the DP bits
-   then follow from the DPK target of the RC formula. Under-tiling costs +7–14%; over-tiling
-   wastes hardware (the formula's overhead term starts to over-penalize, −9…−22%).
+   (spacing/band ≲ 1), i.e. h ≳ 3·1.0625·W/(2·B) with B taken from the measured cycle-entry
+   table of §3.2 (897√W at r = 31, 1 648√W at r = 39, 2 114√W at r = 47, all at M = 2^14) —
+   there is no clean power law in M to fit (§3.2), so interpolate from measured rows, not a
+   formula. The DP bits then follow from the DPK target of the RC formula. Under-tiling costs
+   +7–14%; over-tiling wastes hardware (the formula's overhead term starts to over-penalize,
+   −9…−22%).
 3. **The DP formula is a good planner.** Within its domain (§5.3) it tracked every configuration
    we ran to ≤ 2.5%; use it, but re-derive DPK with the *effective* DP rate when running SOTA+
    selection rules (their dp rate is not 1/2^d — §3.3's table).
 4. **Tag sourcing in SOTA+.** Substituting an independent tag source for the shared low-bit tag
    keeps the concentration half of the gain but forfeits the DP-rate elevation — worth ≈ 0.004 of
    K at the Kang-1 configuration (statistically zero there) but up to ≈ 0.11 at 2^31/dp5 and
-   growing with the DP-overhead share (≈ 1.17 predicted at 2^31/dp12; §3.4). If DP density matters
-   to you (DB size), keep the shared tag.
+   growing with the DP-overhead share (§3.4). If DP density matters to you (DB size), keep the
+   shared tag.
 5. **The mirror idea is dead** (§6.1) — as a K optimization. As a DB-size/K trade it is dominated
    by simply lowering dp.
 
 ### 7.4 Open problems
 
 (a) A first-principles derivation of K = 1.15 from the band geometry and the two-channel algebra —
-our confinement measurements supply the missing geometric ingredient (band width, saturation time,
-revisit rate) that any such derivation must consume. (b) The exponent in Law 3.2: the control
-experiment (§3.4) shows the law survives re-keying the tag, so the concentration is over
-position-derived classes, not DP classes specifically; a Markov-chain analysis of the DP-seeking
-walk (the walk is *captured* by adjacent DPs rather than landing on them) is the natural next
-step, as is an explanation of the real-curve SOTA+ point sitting 2.5σ below the model (§5.6).
-(c) The n = 48 low-DPK residuals (+10–15% at dp ≤ 14, h = 512) — we attributed
-them to herd geometry by monotonicity but did not model them. (d) Whether the SOTA family's
+our confinement measurements supply the missing geometric ingredient (band width, cycle-entry time,
+revisit rate) that any such derivation must consume. (b) The premise of Law 3.2: the birthday
+substitution (§3.3) explains the √ form and the exponent; what remains open is why the walk's
+*visit* masses track the static selection-class masses π_c — the control experiment (§3.4) shows
+the law survives re-keying the tag, so the concentration is over position-derived classes, not DP
+classes specifically; a Markov-chain analysis of the DP-seeking walk (the walk is *captured* by
+adjacent DPs rather than landing on them) is the natural next step, as is an explanation of the
+real-curve SOTA+ point sitting 2.5σ below the model (§5.6). (c) The n = 48 low-DPK residuals (+10–15% at dp ≤ 14, h = 512) — we attributed
+them to herd geometry by monotonicity; the long-cycle measurements of §5.4 now measure the
+cycling contribution at those dp directly (a few percent of steps), so the residual unmodeled share is
+the geometry itself. (d) Whether the SOTA family's
 algebra admits a *third* cheap sample (e.g. storing both P + J and P − J when both hit a DP) — our
 mirror experiment warns that added samples help only if their candidates stay in-window.
 
@@ -960,11 +1136,12 @@ boundaries for the published formulae.
 
 ### 8.3 On the "Churchwell" preprint
 
-We reference an unpublished preprint claiming a 1-D constant of √(π/2) ≈ 1.2533. We could not
-locate a buildable implementation or a verifiable version of the argument, and our §6.2 analysis
-identifies a specific obstruction any such construction must address; our critique (unbuildable
-code, unsound merge argument) is an assessment of an artifact we could not verify and should be
-read as inviting correction rather than as a settled judgment. We chose to report this rather than
+We reference an unpublished, community-circulated preprint claiming a 1-D constant of
+√(π/2) ≈ 1.2533. We could not verify it: no buildable implementation or verifiable version of the
+argument was available to us at the time of writing, and our §6.2 analysis identifies a specific
+obstruction any such construction must address. Our assessment — an unverifiable artifact, and a
+merge step we could not confirm conserves the exponent algebra — is provisional and should be read
+as inviting correction rather than as a settled judgment. We chose to report this rather than
 suppress it because the 1.2533 figure circulates in the community as an established floor; if the
 preprint's author makes a verifiable version available, we will gladly re-examine. Until then, the
 floor rests on the kind of evidence most community folklore rests on: it was too good not to
@@ -985,10 +1162,12 @@ standard argument for rejecting low-entropy nonces.
 ## 9 Reproducibility
 
 All instruments are single-file C programs (Appendix A lists paths, builds and the exact run
-matrix); every number in this paper is traceable to a line of one of the cited output files or a
-stated derivation from them, and the artifacts
-we re-ran to verify file integrity (the 1v1 sweep and the EC cross-checks) reproduced the archived
-summaries exactly. We mark every number that is a model estimate rather than a measurement and
+matrix); every number in this paper is a line of one of the `out/` files, each produced by the
+exact command listed for it in `out/MANIFEST.txt`. The first draft's own output files were lost
+before publication, so `out/` holds re-runs of the original commands; each reproduces the value
+the first draft printed, digit for digit in the printed fields (Appendix A changelog, which
+also records a mis-reconstruction of 16 of those commands in the previous revision and its
+correction). We mark every number that is a model estimate rather than a measurement and
 every censored sample. Of the two open items flagged by the first draft of this section, the
 higher-trial replication of the independent-tag control is resolved (§3.4: pooled to 40 000
 trials per configuration over fresh seeds, conclusions unchanged), and the real-curve SOTA+
@@ -1036,13 +1215,16 @@ errors and interpretations are the author's.
 10. RetiredCoder, Bitcointalk research thread 5517607 ("ECDLP kangaroo methods"), community
     verification record.
 11. "Churchwell" (pseudonymous?), unpublished preprint on 1-D endomorphism-accelerated kangaroo
-    walks and the √(π/2) ≈ 1.2533 constant. **Unverifiable at the time of writing; see §6.3, §8.3.**
+    walks and the √(π/2) ≈ 1.2533 constant. Circulated informally; no title page, ePrint number or
+    archive URL known to us as of 2026-10. **Unverifiable at the time of writing; see §6.3, §8.3.**
 12. Bitcoin puzzle transaction community documentation (the 2^n-bounty puzzle series), for the
     motivation and the r ∈ [32, 160] practical range regime.
 
-*Institutional-constants note:* √(π/2) = 1.253314…; the Kolmogorov distribution's mean E[sup_t |B_t|]
-for standard Brownian motion on [0,1] equals √(π/2); we cite the constant's arithmetic identity,
-not a priority claim on its use.
+*Institutional-constants note:* √(π/2) = 1.253314… is the classical birthday-process constant for
+a *single* self-colliding pool (the Pollard ρ first-repeat factor); the Kolmogorov distribution
+(supremum of the Brownian bridge) has
+mean √(π/2)·ln 2 ≈ 0.869, and √(π/4) = 0.886 is the two-sample analogue 1.2533/√2. We cite the
+constants' arithmetic identities, not a priority claim on their use.
 
 ## Appendix A. Artifact manifest and run matrix
 
@@ -1057,6 +1239,8 @@ All paths are from the analysis host; the raw outputs are quoted verbatim in the
 | `eckang.c` | real secp256k1 ground truth (OpenSSL); SOTA/SOTA+ with shared inversion; `-R` matches `-n−1` of kangsim |
 | `walktest.c` | single-walk displacement statistics, EC vs Z/p |
 | `hashtest.c` | oracle DP-rate uniformity |
+| `bandm2.c` | single-walk cycle instrument (§3.2): Brent cycle detection on the deterministic Z/p SOTA trajectory; reports tail μ, period λ, cycle-entry band, budget-cutoff bands; flags `-n -M -w -s`; `-esc -win T` mode (this revision): escape-rule walks with exact revisit detection over a T-step window (hash set of visited (x, pending-esc) states) — the §3.2 escape-cap check |
+| `kangsim_diag.c` | `kangsim_final.c` plus `-ts <seed>` (separate seed for the method-0 jump table; unset = identical behavior, verified against the first draft's 1v1 values), `-cyclog` (fraction of kangaroos in a detected cycle at solve time), `-cyclog2` (this revision: online Brent long-cycle oracle per kangaroo — per-life end classification short-detect/timeout-in-cycle/timeout-free, steps-in-cycle share, and occupancy by life-step bucket), and solve-channel counters (always on; classify the *solving* collision as tame-wild / wild-wild / other) — §5.7's table-draw sweep and §5.4's cycle and long-cycle counts, §6.3's solve-channel shares |
 
 **Third-party sources analyzed (not modified):**
 
@@ -1077,7 +1261,7 @@ All paths are from the analysis host; the raw outputs are quoted verbatim in the
   `B_1v1_jm{0.5,1,2,3,4}_clean` (re-run for this paper; the archived copies of the original five
   files contain interleaved output from two concurrent runs and were re-verified against the
   clean reruns, which reproduce their summary lines exactly).
-* C-batch, n = 48, 100–300 trials: `C_classic`, `C_3way`, `C_mirror`, `C_sota`, `C_sotap_v2`,
+* C-batch, n = 48, 80–300 trials (exact per-file commands in `out/MANIFEST.txt`): `C_classic`, `C_3way`, `C_mirror`, `C_sota`, `C_sotap_v2`,
   dp sweep `C_sota_dp{12,14,16,18,20,24}`, escape variants `C_sota_dp{12,14,16,18}_esc`,
   `C_sotap_dp14_esc`, `C_sota_dp14_js4_esc`, `C_sota_js{4,5}`, herd sweep `C_sota_k{2048,8192}`,
   `C_sota_k8192_dp12_esc`, `C_sota_k2048_dp14_esc`, `C_sota_k32k_dp16_esc`, `C_sota_M9`,
@@ -1096,8 +1280,22 @@ All paths are from the analysis host; the raw outputs are quoted verbatim in the
   `EC_sotap_R31_dp5` in §5.6). Seeds are recorded in each file's header/manifest
   (`out/rep2026/scan_manifest.txt`); the archived production runs were re-verified to reproduce
   their summary lines exactly on the default seed before pooling.
-* Band measurements (§3.2): `bandm.c` sweep, 40 trials × {10^3, 10^4, 10^5, 10^6} steps ×
-  M ∈ {2^6,…,2^16}.
+* Band / cycle measurements (§3.2): the first draft's `bandm.c` (step-budget means; source lost in
+  the snapshot shuffle — its output `bandm_results.txt` is archived) is superseded in this revision
+  by `bandm2.c` (Brent cycle detection on the exact trajectory): 40 alternating tame/wild walks per
+  configuration — r ∈ {31, 39, 47} at M = 2^14, and r = 31 at M ∈ {2^6, 2^9} — reporting tail μ,
+  period λ, cycle-entry band and the budget-cutoff bands (`out/bandm2_*.txt`).
+* 1v1 jump-table-draw sweep (§5.7, this revision): `kangsim_diag.c -m 0 -n 32 -t 3000` with
+  `-jm {0.5,1,2,3,4}` × four jump-table seeds `-ts 0xBBBB000{1..4}` at a fixed trial stream
+  (`out/1v1_tabseed_*.txt`).
+* Cycle-status counts at solve time (§5.4, this revision): `kangsim_diag.c -cyclog` at n = 48,
+  h ∈ {512, 2048}, dp ∈ {12, 14} (`out/cyclog_*.txt`).
+* Long-cycle occupancy and solve-channel battery (this revision, third-referee pass):
+  `kangsim_diag.c -cyclog2` at n = 48, h = 512 (simple dp 14 and dp 20; escape dp 14) and
+  h = 2048 (escape dp 14), plus dp 24 simple (20 trials); solve-channel shares at n = 32
+  (1 500 trials) and n = 41 (300 trials) (`out/cyclog2_*.out`); and `bandm2.c -esc -win 48000`
+  at r = 47, M = 2^14, 200 walks (`out/bandm2_esc_r47.txt`) — §3.2's escape-cap check, §5.4's
+  long-cycle table, §5.4's dp ≥ 20 stall, §6.3's wild–wild share.
 
 **Build/run examples.**
 
@@ -1112,6 +1310,49 @@ clang -O2 eckang.c -o eckang -I<openssl>/include -L<openssl>/lib -lcrypto
 
 **Determinism.** Each run fixes one seed (default `0xABCDEF0123456789`, `-s` to override); jump
 tables are drawn once per run; per-trial randomness streams from the same generator. Re-running
-the same command reproduces the archived file byte-for-byte (verified for the 1v1 sweep and
-spot-checked elsewhere); cross-seed variance of K is bounded by the jump-table fluctuation
-estimate of §4.4.2.
+the same command reproduces the same output; every configuration in Appendix A was re-run for
+this revision and compared with the first draft's printed values (changelog below).
+Cross-seed variance of K is bounded by the jump-table fluctuation estimate of §4.4.
+
+### Measurement changelog (this revision)
+
+The first draft's raw output files lived in a scratch directory that was lost before
+publication. For this revision every Appendix A configuration was re-run at the default seed
+`0xABCDEF0123456789` — 74 configurations, plus the new `-cyclog2` battery — and each result
+was compared with the value the first draft printed. "Reproduces" below means the printed
+fields agree digit for digit: mean K and its ±CI to four decimals, and K_weighted, median
+and sd where the first draft printed them. Bytes cannot be compared, because the original
+files are gone.
+
+- **58 of 74 configurations reproduced on the first attempt.** These include all 1v1 rows
+  (the jm = 4 row's printed median 19.38 among them; §5.7 explains why that median is
+  unstable) and four of the five EC cross-checks.
+- **16 did not, and every one of them traces to a wrong command, not to the instrument.**
+  The re-run commands had been reconstructed from the paper's text rather than taken from the
+  run record, and 16 of them differed from what was actually run: trial counts on ten
+  n = 48 rows (the original runs used 80–300 trials) and on three n = 41/n = 32 rows, an `-esc`
+  flag added to the SOTA + mirror n = 48 row (the original used simple handling), `-w 300`
+  instead of `-w 150` on the priced SOTA+ v2 + mirror row, and SOTA instead of SOTA+ v2 on
+  one R = 32 EC row. Re-run with the original commands, recovered from the session record of
+  the first-draft runs, all 16 reproduce the first draft's printed values digit for digit
+  (for example C_mirror 2.2834 ± 0.1882, dp 16 escape 2.2652 ± 0.1582, dp 20 10.6570 ±
+  1.5753, EC SOTA+ R = 32 1.0512).
+- **The previous revision's "pre-fix instrument artifact" diagnosis is withdrawn.** Acting on
+  it, that revision replaced nine first-draft values (C_mirror, C_sota_mirror, dp 16 and
+  dp 18 escape, dp 18 and dp 20 simple, js 4 escape, h = 8192 dp 12 escape, h = 32768 dp 16
+  escape) with values from the mis-reconstructed commands. All nine are restored here, with
+  every quantity derived from them (residuals, simple-vs-escape gaps, the js effect).
+  The n = 48 clustering of the mismatches reflects only which batches' command lines were
+  mis-reconstructed.
+- **One comparison is changed on substance.** The SOTA + mirror n = 48 row ran with simple
+  loop handling, so its like-for-like baseline is simple-handling SOTA (1.9502 ± 0.1025), not
+  the escape-rule 1.7601 the first draft used; §6.1 now compares it that way (+7.8% ± 9%, not
+  significant).
+- **One figure is kept from the previous revision, with its provenance stated.** The priced
+  SOTA + mirror row at n = 41 shows K_weighted 1.4641, from the same 4 000-trial run whose
+  K_main (1.1262) appears in that row. The first draft printed 1.4586, from a separate
+  3 000-trial run of the same configuration (K_main 1.1220). Both reproduce exactly, and
+  K_weighted is an accounting identity (§6.1).
+
+The exact command behind every file in `out/` is listed in `out/MANIFEST.txt`; the row-by-row
+record, including the earlier misdiagnosis, is in the repository's `FIXLOG.md`.

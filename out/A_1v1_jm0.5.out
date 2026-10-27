@@ -1,0 +1,5 @@
+# method=classic1v1 n=41 (W=2^40) kang=512 DP=5 M=2^14 trials=1500 v=2 walt=0/1000 mirror=0 jm=0.50
+matches: tw=0 ww=0 tt=0 other=0 restarts=0 steps=0
+solved 1500/1500  K_main=2.3194 +/- 0.0617 (95%CI)  median=2.2150  sd=1.2184
+dp_rate=1/0.0  matches: tame-wild=0 wild-wild=0 tame-tame=0 other=0  best |cand-k'|=0  maxdisp=0.000e+00 (sqrtW=1.049e+06)
+ops_mean=2432055 (2^21.21)  DPs_per_kang=0.00  restarts/kang=0.000
